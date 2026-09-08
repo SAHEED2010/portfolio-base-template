@@ -1,0 +1,240 @@
+# DECISIONS.md
+
+Settled decisions, grouped by topic. Each entry has a date and a
+one-line reason. Do not reopen without cause. Append new entries under
+the right section — create a new section if none fits.
+
+CLAUDE.md has the short-form summary of what's settled. This file has
+the reasoning.
+
+---
+
+## Stack
+
+- **2026-09-07 — Next.js App Router + TypeScript + Tailwind + Supabase
+  + Vercel + Resend**: single Supabase account per client covers DB,
+  storage and auth; server actions remove the need for a separate API
+  layer.
+- **2026-09-07 — Not Turso, not Mongo Atlas**: databases only. Would
+  require a separate storage account and separate auth, tripling the
+  per-client setup.
+- **2026-09-07 — Not Laravel**: reference (rezaghz.com) is Laravel/
+  Blade, but one-repo-per-client + Vercel deploy is lighter than
+  matching that stack for our scope.
+- **2026-09-07 — pnpm, `src/` layout, `@/*` alias, ESLint + Prettier**:
+  scaffolding choices at Phase 1 step 1. Pnpm is disk-efficient and
+  Vercel-native; `src/` separates app code from config as theme/client
+  files accumulate at root.
+- **2026-09-08 — `.npmrc` with `node-linker=hoisted`**: pnpm's default
+  symlink-based `node_modules` fails with EPERM on Windows without
+  Developer Mode enabled. Hoisted linking is functional but less
+  disk-efficient; removable once Developer Mode is on.
+
+## Product shape
+
+- **2026-09-07 — Neutral base template, forked once per client**: two
+  clients picked the same reference. Fork keeps the base neutral and
+  lets each fork tailor to its client's profession without touching
+  the other.
+- **2026-09-07 — Base-to-fork drift accepted**: a bug fixed in the
+  base does not auto-propagate. Mitigation: CHANGES.md logs base
+  changes; port by hand when a fork is touched for other reasons.
+- **2026-09-08 — `seed.sql` reads as a coherent creative-professional
+  persona, not "Sample 1 / Sample 2"**: the base should look like a
+  real portfolio on first load so its design can actually be judged.
+  Narrows the "nothing profession-specific in the base" rule to CODE
+  and COPY IN COMPONENTS — seed rows are replaceable content that
+  every fork overwrites, and a placeholder name/persona there is
+  intentional, not a leak.
+
+## Schema
+
+- **2026-09-07 — Rigid tables, not schema-driven**: it's a portfolio,
+  shape is known. Accepted cost: new profession = code change, not
+  config edit.
+- **2026-09-07 — Projects and Portfolio merged into `works`**:
+  reference had two near-identical grids; the distinction was Reza's,
+  not general.
+- **2026-09-07 — Section labels stored in `site_settings`**: cheap
+  80% of what schema-driven would give — client sees "Cases" or
+  "Publications" without a migration.
+- **2026-09-07 — Headings editable, not hardcoded**: "edit almost all
+  the information" was the client requirement. The reference did NOT
+  do this — every heading is in Blade. Our base fixes that.
+
+## Design tokens
+
+- **2026-09-08 — `theme.ts` holds TWO font tokens (`displayFont` +
+  `bodyFont`), amending the original "one font family"**: a real
+  display/body contrast is most of what separates a designed page from
+  a template. The "one file to restyle a fork" principle is unchanged —
+  the file just holds two font tokens instead of one.
+- **2026-09-08 — Font pairing: Fraunces (display) + Inter (body)**,
+  loaded via `next/font/google` with `display: swap`. Fraunces is
+  variable (optical-size and "wonk" axes), so a fork can shift
+  character by editing `theme.ts` alone rather than swapping fonts.
+- **2026-09-08 — Palette "Slate & Teal" with a warm neutral ramp**.
+  Fixed values, not to be re-argued:
+  - `primary` `#14181C` (deep slate ink)
+  - `accent` `#2E6E68` (muted teal); hover `#245853`, light `#3E8A83`
+  - neutrals, warm-tinted rather than pure gray (pure `#888` grays are
+    the tell of a template):
+    `50 #FAF9F7`, `100 #F4F2EF`, `200 #E8E4DF`, `300 #D6D1CA`,
+    `400 #A9A29A`, `500 #7D766D`, `600 #5C5650`, `700 #423E39`,
+    `800 #2B2825`, `900 #1A1917`
+  - Deliberately not yellow and not SaaS-indigo, to avoid both the
+    reference's signature and the default-template look.
+- **2026-09-08 — Animation is CSS + a small IntersectionObserver
+  reveal hook; no Framer Motion**: hero entrance, scroll reveals and
+  hover states are all trivially CSS, and the testimonial carousel can
+  use native scroll-snap. Framer Motion would force `"use client"`
+  boundaries around sections that should stay server components for
+  Supabase reads. Revisit per-component only if a specific animation
+  needs orchestration CSS can't express.
+- **2026-09-08 — Hero tagline is a fade/slide crossfade, ~300ms cap,
+  reserved line-height, honors `prefers-reduced-motion`**: not the
+  reference's typewriter, which reads dated and shifts layout as the
+  line grows.
+- **2026-09-08 — Sticky header gets one on-scroll transition
+  (transparent → solid, slight shrink)**: defensible because it
+  reclaims vertical real estate on mobile, not because it's decorative.
+
+## V1 scope
+
+- **2026-09-07 — Cut from V1**: booking, payments, i18n, blog, promo
+  modal, project/portfolio detail pages, self-serve password reset.
+  Each is in the reference, none are required by the two clients.
+- **2026-09-07 — Each work card links to an external URL**: no detail
+  pages in V1. Add in V2 only if a client's work actually needs it.
+- **2026-09-07 — Password reset is manual via Supabase dashboard**:
+  removes an email-service dependency for V1.
+- **2026-09-09 — Contact does BOTH: direct-message buttons (primary)
+  and the contact form (fallback)**. Updates the earlier thinking
+  that the form was the only contact path. Visitors arrive from
+  WhatsApp and Instagram on phones, where tapping through to a
+  messaging app converts far better than filling a form — but
+  removing the form entirely would mean enquiries live only in the
+  client's personal WhatsApp: no record on the site, unsearchable,
+  lost on a phone change, and recruiters often prefer a formal
+  written enquiry anyway. `contact_messages` and the studio inbox
+  therefore stay, fed by the form path.
+- **2026-09-09 — Contact section is stacked, not the details/form
+  split**: a side-by-side layout gives the message buttons and the
+  form equal visual weight, which contradicts the intended priority.
+  Vertical order states it plainly — message first, write second. The
+  split only ever did work on desktop; at 375px it collapsed to this
+  same stack.
+
+## Auth
+
+- **2026-09-07 — Two users per site (client + support)**: I need
+  access without a shared password.
+- **2026-09-07 — Admin at `/studio`, not `/admin` or `/panel`**: path
+  obscurity is a small extra, not the security layer. Real Supabase
+  Auth behind it.
+
+## Images and storage
+
+- **2026-09-07 — Browser-side compression, 2MB hard cap, Supabase
+  Storage**: Vercel has no persistent disk, so local file writes
+  aren't an option. Client-side compression avoids server CPU and
+  queues.
+- **2026-09-08 — One bucket named `media`, not per-purpose buckets**:
+  generic name covers portraits, work images and avatars; the path
+  encodes which. One bucket keeps the policy surface small.
+- **2026-09-08 — Bucket defined in a SQL migration, not
+  `config.toml`**: config.toml buckets are local-dev only. The base is
+  forked to real Supabase projects, so the bucket must be reproducible
+  in production.
+- **2026-09-08 — Bucket-level `file_size_limit` of 2 MiB**: defence in
+  depth. The browser-side compression cap rejects oversize files with
+  a friendly error; the bucket rejects them even if that layer is
+  bypassed.
+- **2026-09-08 — MIME allow-list: jpeg, png, webp only**: `image/svg+xml`
+  excluded because SVG is an XSS vector on user upload; `image/gif`
+  excluded as large, animated, and rarely wanted on a portfolio.
+
+## Accounts and ownership
+
+- **2026-09-07 — Client owns the Supabase project and domain, invites
+  me as collaborator; Vercel account is mine**: shared passwords are
+  a liability; invites are revocable. Vercel under me because I'm the
+  one deploying.
+- **2026-09-07 — Free tier accepted, with known cost**: Supabase free
+  tier pauses after inactivity. Mitigation: a weekly Vercel cron pings
+  the DB to keep it warm.
+
+  ## CI and code review
+
+- **2026-09-07 — CI on push in Phase 1**: GitHub Actions runs
+  `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` on every
+  push and PR. Catches the case where local loop passed but a clean
+  environment fails. Free, low-config, high-signal.
+- **2026-09-07 — No AI review bot in V1**: Claude Code's build-test-
+  review loop already runs tests and type-check before handing over
+  code. Adding CodeRabbit or similar on a solo repo produces mostly
+  style-nit noise that trains me to ignore signals. Revisit at Phase
+  2 when there's a base-vs-fork drift question worth automated review.
+
+## Schema details
+
+- **2026-09-08 — UUID primary keys (`gen_random_uuid()`)**: Supabase
+  convention; avoids exposing sequential row counts (e.g. total
+  testimonials) the way a serial/bigint id would.
+- **2026-09-08 — `created_at` + `updated_at` timestamptz on every
+  table, `updated_at` maintained by a trigger**: cheap and uniform;
+  useful for support/debugging even on tables that rarely change.
+- **2026-09-08 — `display_order` column name, not `order`**: `order`
+  is a reserved SQL keyword; avoids quoting it everywhere.
+- **2026-09-08 — Image/logo/avatar fields store the full public
+  Supabase Storage URL as text**: simplest to render directly in
+  markup with no URL-building step. Accepted coupling to Supabase
+  Storage specifically — noted in SCHEMA.md.
+- **2026-09-08 — `stats.number` is free text, not integer**: stat
+  blocks mix formats ("50+", "10 yrs", "$2M") that aren't computed
+  on, so forcing a numeric type blocks legitimate content for no
+  benefit.
+- **2026-09-08 — `experiences.start_date`/`end_date` as structured
+  `date` columns, `end_date` nullable = "Present"**: enables
+  chronological sorting; free text can't be trusted to sort right
+  across entries.
+- **2026-09-08 — `experiences.type` is free text, unconstrained, for
+  V1**: no fixed set of values is known yet. Real client data across
+  forks will tell us if a fixed set (e.g. work/education) emerges —
+  until then a CHECK constraint or enum would just be a guess.
+- **2026-09-08 — `testimonials.rating` nullable integer with CHECK
+  1–5**: some pull quotes carry no star rating; the CHECK still keeps
+  bad data out when a rating is present.
+- **2026-09-08 — `contact_messages` columns: name, email, message,
+  `read` boolean default false, created_at, ip_address (hashed, not
+  raw)**: enough for a working inbox. IP is hashed rather than stored
+  raw so it's still useful for basic spam-pattern matching (repeat
+  submissions) without holding raw PII long-term. Phone/subject are a
+  cheap follow-up migration if a client needs them.
+- **2026-09-08 — `site_settings` is `(key text primary key, value
+  jsonb)`**: one column type handles every case uniformly — JSON
+  string for a heading, JSON array for hero rotating phrases, JSON
+  object if a setting ever needs structure — with no schema change
+  when the shape of a setting's value changes.
+- **2026-09-08 — Added `display_order` to `stats`**: it was the only
+  list table without one, leaving row order non-deterministic.
+  Consistency with the other list tables, and clients will want to
+  reorder the stat block from the studio.
+- **2026-09-09 — `site_settings.contact_channels` shape**: a jsonb
+  array of `{label, url, primary?}`, deliberately mirroring
+  `social_links` so there's one array-of-links shape to learn rather
+  than two. `primary: true` marks the single filled button; the first
+  flagged entry wins, and if a fork flags none (or several) the first
+  entry is used — a malformed array still renders a primary action
+  instead of none. No migration: `site_settings` is key/value jsonb,
+  which is exactly the case it was chosen for.
+- **2026-09-09 — Testimonials are a continuous marquee, not a
+  scroll-snap carousel**, with an explicit pause/play control.
+  Auto-moving content needs a stop mechanism (WCAG 2.2.2); hover and
+  focus pausing cover mouse and keyboard but **not touch**, so a
+  visible button is required rather than optional. Falls back to a
+  plain scroller under `prefers-reduced-motion`.
+- **2026-09-08 — RLS smoke tests use plain `fetch` against PostgREST,
+  not `@supabase/supabase-js`**: no extra dependency, and it exercises
+  the same HTTP path the app uses, so RLS is observed directly rather
+  than mediated by a client library.

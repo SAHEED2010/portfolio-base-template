@@ -1,0 +1,286 @@
+@import "tailwindcss";
+
+/* Design tokens. Mirrors src/theme.ts — a fork restyles by editing
+   these two files together. Tailwind v4 turns each --color-* here
+   into a utility (bg-accent, text-neutral-500, and so on). */
+@theme {
+  --color-primary: #14181c;
+  --color-accent: #2e6e68;
+  --color-accent-hover: #245853;
+  --color-accent-light: #3e8a83;
+
+  --color-neutral-50: #faf9f7;
+  --color-neutral-100: #f4f2ef;
+  --color-neutral-200: #e8e4df;
+  --color-neutral-300: #d6d1ca;
+  --color-neutral-400: #a9a29a;
+  --color-neutral-500: #7d766d;
+  --color-neutral-600: #5c5650;
+  --color-neutral-700: #423e39;
+  --color-neutral-800: #2b2825;
+  --color-neutral-900: #1a1917;
+
+  --font-display: var(--font-fraunces);
+  --font-body: var(--font-inter);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --section-y: clamp(5rem, 12vw, 9rem);
+  --gutter: clamp(1.25rem, 5vw, 2.5rem);
+  --measure: 72rem;
+  --motion-duration: 300ms;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Anchor links land below the sticky header instead of under it. */
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--color-neutral-50);
+  color: var(--color-primary);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fraunces is variable — these axes are what let a fork shift the
+   display font's character without swapping families.
+   `opsz` = optical size, `SOFT` = softness, `WONK` = the quirky
+   alternate glyphs. Dialed mostly-off for restraint. */
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-variation-settings:
+    "SOFT" 0,
+    "WONK" 0;
+}
+
+/* Skip link — hidden until focused. Without it a keyboard user has
+   to tab through the whole nav on every visit to reach the content. */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  transition: transform 200ms var(--ease-out-soft);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Visible, on-brand focus ring — keyboard users get a real target,
+   not the browser default that vanishes against dark surfaces. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ===============================================================
+   MOTION SYSTEM
+   One vocabulary used across every section, so motion reads as a
+   deliberate language rather than three isolated moments. Each
+   entry states what it is for in one line.
+   Durations: 150ms tap · 200ms colour · 300-400ms transform ·
+   700ms reveal · 7s ambient.
+   All of it is switched off by the reduced-motion block at the
+   bottom of this file.
+   =============================================================== */
+
+/* Scroll-reveal. Elements start slightly low and transparent, and
+   .is-visible is added by the IntersectionObserver in
+   components/reveal.tsx. Kept in CSS so the JS only toggles a class.
+   700ms over 1.5rem: slightly longer and further than the default,
+   which reads as settling rather than snapping. */
+.reveal {
+  opacity: 0;
+  transform: translateY(1.5rem);
+  transition:
+    opacity 700ms var(--ease-out-soft),
+    transform 700ms var(--ease-out-soft);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Underline that grows from the left instead of appearing at once.
+   Used on every text link (nav, socials, email) so links share one
+   behaviour site-wide. */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  padding-bottom: 2px;
+  transition:
+    background-size 300ms var(--ease-out-soft),
+    color 200ms var(--ease-out-soft);
+}
+
+.link-underline:hover,
+.link-underline:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* Press feedback. Matters most on touch, where hover does not exist
+   and this is the only confirmation a tap registered. */
+.tap {
+  transition: transform 150ms var(--ease-out-soft);
+}
+
+.tap:active {
+  transform: scale(0.98);
+}
+
+/* Testimonial marquee. The track holds the cards twice, so shifting
+   it exactly -50% lands on an identical frame and the loop is
+   seamless with no visible jump.
+   60s is deliberately slow — these are sentences to be read, not a
+   ticker. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-x 60s linear infinite;
+}
+
+/* Pause on hover AND focus-within: hover covers mouse users, focus
+   covers keyboard users tabbing into a card. Without this, moving
+   content you cannot stop is a WCAG 2.2.2 failure. */
+.marquee-track:hover .animate-marquee,
+.marquee-track:focus-within .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Explicit pause, toggled by the control. Hover/focus pausing does
+   not exist on touch, so without this a phone user has no way to
+   stop the motion — a WCAG 2.2.2 failure. */
+.animate-marquee.is-paused {
+  animation-play-state: paused;
+}
+
+/* Ambient idle motion for the hero portrait. Deliberately slow (7s)
+   and small (8px) — it should register as the page being alive, not
+   as something moving. */
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float-y 7s ease-in-out infinite;
+}
+
+/* The offset accent frame drifts on a slightly different cycle to
+   the panel, so the two never move as one rigid block. */
+@keyframes float-frame {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(3px, -4px);
+  }
+}
+
+.animate-float-frame {
+  animation: float-frame 9s ease-in-out infinite;
+}
+
+/* Hero entrance. Staggered by inline animation-delay at the call
+   site so the eye lands name → tagline → actions in order. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-rise {
+  animation: rise-in 700ms var(--ease-out-soft) both;
+}
+
+/* Horizontal scroll track (testimonials). The scrollbar is hidden
+   because the peeking next card is the affordance — but the element
+   stays keyboard-scrollable via tabindex at the call site. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scroll cue: a short accent segment travelling down a hairline.
+   Quieter than a bouncing arrow, and it reads as "there is more"
+   rather than as decoration. */
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(1000%);
+  }
+}
+
+.animate-scroll-cue {
+  animation: scroll-cue 2.2s var(--ease-out-soft) infinite;
+}
+
+/* One global off-switch. Every animation above is decorative, so
+   respecting the OS setting costs nothing and is the accessible
+   default. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The blanket rule above would collapse the marquee to its end
+     frame (showing the duplicated half). Stop it properly instead,
+     and hand the track back to the user as a normal scroller. */
+  .animate-marquee {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .marquee-track {
+    overflow-x: auto !important;
+  }
+}
