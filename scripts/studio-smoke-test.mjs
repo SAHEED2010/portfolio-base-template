@@ -1,15 +1,16 @@
 // Studio smoke test — proves the authenticated edit path actually
-// writes, rather than merely rendering.
+// writes, for EVERY list table, rather than merely rendering.
 //
 // It exists because of a real regression: wrapping useActionState's
-// dispatch in an arrow function turned the edit form into a CLIENT
+// dispatch in an arrow function turned an edit form into a CLIENT
 // action. React then rendered
 //   action="javascript:throw new Error('React form unexpectedly submitted.')"
-// and the submit never reached the server — updateWork was invoked
+// and the submit never reached the server — the action was invoked
 // zero times while the page looked completely fine. Type-checks,
 // lint, build and "the page renders" all passed throughout.
 //
-// Assertion 2 below is the guard for exactly that. Run this after
+// The "is a SERVER action" assertion below is the guard for exactly
+// that, and it now runs against all five tables. Run this after
 // touching any studio form.
 //
 // Usage:
@@ -52,36 +53,84 @@ const admin = (path, init = {}) =>
   });
 
 const decode = (s) =>
-  s
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/&#x27;/g, "'");
+  s.replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&#x27;/g, "'");
 
-// --- set up: a throwaway admin user and a row to edit -------------
+// One spec per table. `label` is the column the edit changes and the
+// assertion reads back.
+const TABLES = [
+  {
+    table: "works",
+    route: "works",
+    label: "title",
+    seed: { title: `${MARK} work`, external_url: "https://example.com" },
+    edit: { subtitle: "", external_url: "https://example.com", image_url: "" },
+    invalid: { title: "", external_url: "not-a-url", image_url: "" },
+  },
+  {
+    table: "skills",
+    route: "skills",
+    label: "name",
+    seed: { name: `${MARK} skill` },
+    edit: {},
+    invalid: { name: "" },
+  },
+  {
+    table: "stats",
+    route: "stats",
+    label: "label",
+    seed: { label: `${MARK} stat`, number: "50+" },
+    edit: { number: "60+" },
+    invalid: { label: "", number: "" },
+  },
+  {
+    table: "testimonials",
+    route: "testimonials",
+    label: "name",
+    seed: { name: `${MARK} client`, quote: "Great work." },
+    edit: { quote: "Great work.", rating: "", avatar_url: "" },
+    // rating 9 is out of the 1-5 range the schema enforces
+    invalid: { name: "", quote: "", rating: "9", avatar_url: "" },
+  },
+  {
+    table: "experiences",
+    route: "experiences",
+    label: "title",
+    seed: {
+      title: `${MARK} role`,
+      org: "Smoke Org",
+      start_date: "2020-01-01",
+    },
+    edit: {
+      org: "Smoke Org",
+      start_date: "2020-01-01",
+      end_date: "",
+      type: "",
+      description: "",
+      logo_url: "",
+    },
+    // end_date before start_date exercises the cross-field refine
+    invalid: {
+      title: "",
+      org: "",
+      start_date: "2020-01-01",
+      end_date: "2019-01-01",
+      type: "",
+      description: "",
+      logo_url: "",
+    },
+  },
+];
+
+// --- setup: throwaway admin user ----------------------------------
 const createdUser = await admin("/auth/v1/admin/users", {
   method: "POST",
-  body: JSON.stringify({
-    email: EMAIL,
-    password: PASSWORD,
-    email_confirm: true,
-  }),
+  body: JSON.stringify({ email: EMAIL, password: PASSWORD, email_confirm: true }),
 });
 if (!createdUser.ok) {
   console.error(`Could not create test user: ${await createdUser.text()}`);
   process.exit(1);
 }
 const userId = (await createdUser.json()).id;
-
-const seeded = await admin("/rest/v1/works", {
-  method: "POST",
-  headers: { Prefer: "return=representation" },
-  body: JSON.stringify({
-    title: `${MARK} work`,
-    external_url: "https://example.com",
-    display_order: 9999,
-  }),
-});
-const work = (await seeded.json())[0];
 
 const jar = new Map();
 const supabase = createServerClient(URL_BASE, ANON_KEY, {
@@ -99,108 +148,114 @@ if (signInError) {
   process.exit(1);
 }
 const cookie = [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
-const pageUrl = `${APP}/studio/works/${work.id}`;
 
-console.log("--- assertions ---");
-
-// 1. The studio must not be reachable without a session.
+console.log("--- access control ---");
 {
   const res = await fetch(`${APP}/studio/works`, { redirect: "manual" });
   check(
-    "unauthenticated /studio/works is redirected to login",
-    res.status === 307 && (res.headers.get("location") ?? "").includes("/studio/login"),
+    "unauthenticated studio is redirected to login",
+    res.status === 307 &&
+      (res.headers.get("location") ?? "").includes("/studio/login"),
     `HTTP ${res.status} -> ${res.headers.get("location")}`,
   );
 }
 
-const html = await (await fetch(pageUrl, { headers: { cookie } })).text();
-const anchor = html.indexOf("flex max-w-2xl");
-const start = html.lastIndexOf("<form", anchor);
-const frag = start === -1 ? "" : html.slice(start, html.indexOf("</form>", start) + 7);
-const openTag = frag.match(/<form[^>]*>/)?.[0] ?? "";
+const seededIds = [];
 
-// 2. THE REGRESSION GUARD.
-{
+for (const spec of TABLES) {
+  console.log(`\n--- ${spec.table} ---`);
+
+  const created = await admin(`/rest/v1/${spec.table}`, {
+    method: "POST",
+    headers: { Prefer: "return=representation" },
+    body: JSON.stringify({ ...spec.seed, display_order: 9999 }),
+  });
+  if (!created.ok) {
+    check(`${spec.table}: seed row`, false, await created.text());
+    continue;
+  }
+  const row = (await created.json())[0];
+  seededIds.push([spec.table, row.id]);
+
+  const pageUrl = `${APP}/studio/${spec.route}/${row.id}`;
+  const html = await (await fetch(pageUrl, { headers: { cookie } })).text();
+  const anchor = html.indexOf("flex max-w-2xl");
+  const start = html.lastIndexOf("<form", anchor);
+  const frag =
+    start === -1 ? "" : html.slice(start, html.indexOf("</form>", start) + 7);
+  const openTag = frag.match(/<form[^>]*>/)?.[0] ?? "";
+
+  // THE REGRESSION GUARD.
   const clientAction = /javascript:throw/.test(openTag);
   check(
-    "edit form is a SERVER action, not a client function",
+    `${spec.table}: edit form is a SERVER action`,
     /method="POST"/i.test(openTag) && !clientAction,
     clientAction
-      ? "action=javascript:throw — dispatch was wrapped again; the submit will never reach the server"
-      : openTag.slice(0, 100),
+      ? "action=javascript:throw — dispatch was wrapped; submits will never reach the server"
+      : openTag.slice(0, 88),
   );
-}
 
-const actionFields = [
-  ...frag.matchAll(
-    /<input type="hidden" name="(\$ACTION[^"]*)"(?: value="([^"]*)")?\s*\/>/g,
-  ),
-].map(([, name, value]) => [name, decode(value ?? "")]);
+  const actionFields = [
+    ...frag.matchAll(
+      /<input type="hidden" name="(\$ACTION[^"]*)"(?: value="([^"]*)")?\s*\/>/g,
+    ),
+  ].map(([, name, value]) => [name, decode(value ?? "")]);
 
-check(
-  "form carries its action encoding",
-  actionFields.length > 0,
-  actionFields.map(([n]) => n).join(", ") || "none found",
-);
+  const build = (fields) => {
+    const fd = new FormData();
+    for (const [n, v] of actionFields) fd.set(n, v);
+    fd.set("id", row.id);
+    for (const [k, v] of Object.entries(fields)) fd.set(k, v);
+    return fd;
+  };
 
-const build = (fields) => {
-  const fd = new FormData();
-  for (const [n, v] of actionFields) fd.set(n, v);
-  fd.set("id", work.id);
-  for (const [k, v] of Object.entries(fields)) fd.set(k, v);
-  return fd;
-};
-
-// 3. A valid edit must actually reach Postgres.
-const NEW_TITLE = `${MARK} edited`;
-{
-  const res = await fetch(pageUrl, {
+  // A valid edit must reach Postgres.
+  const edited = `${MARK} edited`;
+  await fetch(pageUrl, {
     method: "POST",
     headers: { cookie },
-    body: build({
-      title: NEW_TITLE,
-      subtitle: "",
-      external_url: "https://example.com",
-      image_url: "",
-    }),
+    body: build({ ...spec.edit, [spec.label]: edited }),
     redirect: "manual",
   });
-  const row = await (
-    await admin(`/rest/v1/works?select=title&id=eq.${work.id}`)
+  const afterValid = await (
+    await admin(`/rest/v1/${spec.table}?select=${spec.label}&id=eq.${row.id}`)
   ).json();
   check(
-    "valid edit reaches Postgres",
-    row[0]?.title === NEW_TITLE,
-    `HTTP ${res.status}, stored ${JSON.stringify(row[0]?.title)}`,
+    `${spec.table}: valid edit reaches Postgres`,
+    afterValid[0]?.[spec.label] === edited,
+    `stored ${JSON.stringify(afterValid[0]?.[spec.label])}`,
   );
-}
 
-// 4. Invalid input must be rejected and must not write.
-{
-  const res = await fetch(pageUrl, {
+  // Invalid input must be rejected and must not write.
+  const badRes = await fetch(pageUrl, {
     method: "POST",
     headers: { cookie },
-    body: build({ title: "", external_url: "not-a-url", image_url: "" }),
+    body: build(spec.invalid),
     redirect: "manual",
   });
-  const body = await res.text();
-  const row = await (
-    await admin(`/rest/v1/works?select=title&id=eq.${work.id}`)
+  const badBody = await badRes.text();
+  const afterInvalid = await (
+    await admin(`/rest/v1/${spec.table}?select=${spec.label}&id=eq.${row.id}`)
   ).json();
-  const surfaced = /required|Enter a full URL/i.test(body);
+  const surfaced =
+    /required|Enter a full URL|must be|Use a valid date|Invalid/i.test(badBody);
   check(
-    "invalid input is rejected and the row is untouched",
-    surfaced && row[0]?.title === NEW_TITLE,
-    `errors surfaced: ${surfaced}, title still ${JSON.stringify(row[0]?.title)}`,
+    `${spec.table}: invalid input rejected, row untouched`,
+    surfaced && afterInvalid[0]?.[spec.label] === edited,
+    `errors surfaced: ${surfaced}, value still ${JSON.stringify(afterInvalid[0]?.[spec.label])}`,
   );
 }
 
 // --- cleanup ------------------------------------------------------
 console.log("\n--- cleanup ---");
-await admin(`/rest/v1/works?id=eq.${work.id}`, { method: "DELETE" });
+for (const [table, id] of seededIds) {
+  await admin(`/rest/v1/${table}?id=eq.${id}`, { method: "DELETE" });
+}
 await admin(`/auth/v1/admin/users/${userId}`, { method: "DELETE" });
-console.log(`removed test row and user ${EMAIL}`);
+console.log(`removed ${seededIds.length} test row(s) and user ${EMAIL}`);
 
 const failed = results.filter((r) => !r.passed);
-console.log(`\n${results.length - failed.length}/${results.length} assertions passed`);
+console.log(
+  `\n${results.length - failed.length}/${results.length} assertions passed`,
+);
 if (failed.length) process.exit(1);

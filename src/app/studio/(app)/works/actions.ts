@@ -3,19 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import {
+  emptyToNull,
+  removeObjectByUrl,
+  toFieldErrors,
+  type FormState,
+} from "@/lib/form-helpers";
 import { moveRow, nextDisplayOrder } from "@/lib/reorder";
-import { pathFromPublicUrl, MEDIA_BUCKET } from "@/lib/storage";
 import { requireUser } from "@/lib/supabase/server";
 
-// Zod v4 throughout: top-level formats (z.url), `error` for messages,
-// z.treeifyError / z.flattenError for reading errors back out.
-//
-// Optional-but-empty is the common case in these forms — an untouched
-// input posts "" rather than being absent — so blank strings are
-// normalised to null before validation rather than failing it.
-const emptyToNull = (value: unknown) =>
-  typeof value === "string" && value.trim() === "" ? null : value;
-
+// Zod v4: top-level formats (z.url), `error` for messages.
 const WorkSchema = z.object({
   title: z.string().trim().min(1, { error: "Title is required." }),
   subtitle: z.preprocess(emptyToNull, z.string().trim().nullable()),
@@ -25,11 +22,7 @@ const WorkSchema = z.object({
   }),
 });
 
-export type WorkFormState = {
-  status: "idle" | "error";
-  message?: string;
-  fieldErrors?: Record<string, string[]>;
-};
+export type WorkFormState = FormState;
 
 function readForm(formData: FormData) {
   return {
@@ -50,10 +43,7 @@ export async function createWork(
 
   const parsed = WorkSchema.safeParse(readForm(formData));
   if (!parsed.success) {
-    return {
-      status: "error",
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-    };
+    return toFieldErrors(parsed.error);
   }
 
   const display_order = await nextDisplayOrder(supabase, "works");
@@ -81,10 +71,7 @@ export async function updateWork(
 
   const parsed = WorkSchema.safeParse(readForm(formData));
   if (!parsed.success) {
-    return {
-      status: "error",
-      fieldErrors: z.flattenError(parsed.error).fieldErrors,
-    };
+    return toFieldErrors(parsed.error);
   }
 
   // If the image changed, the old object is now unreferenced. Clean
@@ -148,17 +135,3 @@ export async function moveWork(formData: FormData): Promise<void> {
   revalidatePath("/");
 }
 
-// Best effort by design: a failed cleanup must not fail the user's
-// save. Worst case is a leaked object; the alternative is a broken
-// edit. Logged so it's visible rather than silent.
-async function removeObjectByUrl(
-  supabase: Awaited<ReturnType<typeof requireUser>>["supabase"],
-  url: string,
-) {
-  const path = pathFromPublicUrl(url);
-  if (!path) return;
-  const { error } = await supabase.storage.from(MEDIA_BUCKET).remove([path]);
-  if (error) {
-    console.warn("[works] orphaned storage object", path, error.message);
-  }
-}

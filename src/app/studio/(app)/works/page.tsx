@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import {
+  StudioEmptyState,
+  StudioPage,
+  StudioPageHeader,
+} from "@/components/studio/page-header";
 import { ReorderControls } from "@/components/studio/reorder-controls";
+import { DeleteButton } from "@/components/studio/row-actions";
 import type { Work } from "@/lib/content";
 import { createClient } from "@/lib/supabase/server";
 import { deleteWork, moveWork } from "./actions";
@@ -17,41 +23,20 @@ export default async function WorksPage() {
   const works = (data ?? []) as Work[];
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-6 py-10 lg:px-10 lg:py-14">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <span aria-hidden className="h-px w-8 bg-accent" />
-            <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
-              Works
-            </p>
-          </div>
-          <h1 className="font-display mt-5 text-3xl tracking-tight text-primary">
-            Selected work
-          </h1>
-          <p className="mt-2 max-w-xl text-base text-neutral-600">
-            The order here is the order visitors see.
-          </p>
-        </div>
-
-        <Link
-          href="/studio/works/new"
-          className="tap inline-flex min-h-11 items-center rounded-full bg-accent px-6 text-sm font-medium text-neutral-50 transition-colors hover:bg-accent-hover"
-        >
-          Add work
-        </Link>
-      </div>
+    <StudioPage>
+      <StudioPageHeader
+        eyebrow="Works"
+        title="Selected work"
+        description="The order here is the order visitors see."
+        actionHref="/studio/works/new"
+        actionLabel="Add work"
+      />
 
       {works.length === 0 ? (
-        // Empty state matters here: an empty table hides the whole
-        // section on the public site, and the client should know that
-        // rather than wonder where it went.
-        <div className="mt-10 rounded-xl border border-dashed border-neutral-300 p-10 text-center">
-          <p className="text-base text-neutral-600">No works yet.</p>
-          <p className="mt-1 text-sm text-neutral-500">
-            The Work section stays hidden on your site until you add one.
-          </p>
-        </div>
+        <StudioEmptyState
+          title="No works yet."
+          consequence="The Work section stays hidden on your site until you add one."
+        />
       ) : (
         <ul className="mt-10 flex flex-col gap-3">
           {works.map((work, index) => (
@@ -100,20 +85,15 @@ export default async function WorksPage() {
                 action={moveWork}
               />
 
-              <form action={deleteWork}>
-                <input type="hidden" name="id" value={work.id} />
-                <button
-                  type="submit"
-                  aria-label={`Delete ${work.title}`}
-                  className="tap flex h-9 items-center rounded-lg px-3 text-sm text-neutral-500 transition-colors hover:text-red-700"
-                >
-                  Delete
-                </button>
-              </form>
+              <DeleteButton
+                id={work.id}
+                label={work.title}
+                action={deleteWork}
+              />
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </StudioPage>
   );
 }
