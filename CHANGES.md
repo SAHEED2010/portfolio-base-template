@@ -12,6 +12,56 @@ to care**.
 
 ---
 
+## 2026-09-09 — Studio: Site content, and the seed-drift check
+
+### Added
+
+- `/studio/settings` — the `site_settings` field map
+  (`src/lib/studio/settings-fields.ts`) drives curated, grouped forms
+  (Identity & SEO, Hero, Section labels, About, …) instead of a raw
+  key/value editor. A key in the database but not in the map still
+  renders — as a plain text field with a console warning — rather
+  than vanishing.
+- `scripts/generate-seed-manifest.mjs` / `scripts/seed-manifest.json`
+  / `scripts/check-seed-drift.mjs` — the realistic seed content
+  ("Mara Ellison", "Meridian") is deliberately hard to eyeball as
+  fake, so this compares live content against the seeded values and
+  flags anything unchanged. **Required step before a fork launches**
+  — `FORKING.md` §10.
+- `studio-smoke-test.mjs` now covers all five list tables: 16/16.
+
+### Schema
+
+- `20260909000000_site_settings_value_nullable.sql` — `value` was
+  `NOT NULL`. A JSON `null` in a PostgREST update body always maps to
+  SQL `NULL`, so there was no way to clear an optional setting without
+  hitting the constraint — every such save silently failed.
+  **Forks: run `supabase db push`.**
+
+### Bugs fixed
+
+- Two render-time fallback strings removed (`site_title` defaulting
+  to `"Portfolio"`) — a fallback like that is template copy that could
+  ship to a client's live site unnoticed.
+- The manifest generator's own SQL parser under-counted by 5 keys on
+  first run: a whole-line comment containing a literal semicolon
+  ("…for its own; nothing here is hardcoded.") terminated the
+  regex-based block match early. Comments are now stripped before
+  parsing.
+- `check-seed-drift.mjs`'s first version used `JSON.stringify`
+  equality, which Postgres jsonb defeats silently: object key order is
+  normalized on the way back out of the database, so a semantically
+  identical `contact_channels`/`social_links` value never matched the
+  manifest — a false negative in exactly the direction that matters
+  (content that should have been flagged, wasn't). Replaced with an
+  order-independent deep-equal; verified against the live DB both ways
+  (still-seeded flagged, edited-then-restored flagged again).
+
+**Forks: re-run all four checks (10/10, 5/5, 16/16, then
+`check-seed-drift.mjs` clean) before launch.**
+
+---
+
 ## 2026-09-09 — Studio: auth, shell, and works CRUD
 
 Commits `7387b65`, `99c571a`, `0e18029`, `51c1206`, `393366d`.

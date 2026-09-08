@@ -1,0 +1,183 @@
+{
+  "generated_from": "supabase/seed.sql",
+  "generated_at": "2026-09-08",
+  "site_settings": {
+    "site_title": "Mara Ellison",
+    "site_tagline": "Independent designer and maker",
+    "seo_description": "Portfolio of Mara Ellison — independent designer working across brand, product and print.",
+    "hero_greeting": "Hello, I'm",
+    "hero_name": "Mara Ellison",
+    "hero_phrases": [
+      "I design things people actually use.",
+      "I turn vague ideas into clear ones.",
+      "I make brands feel like themselves.",
+      "I sweat the details nobody notices."
+    ],
+    "hero_intro": "An independent designer working across brand, product and print — currently taking on selected projects.",
+    "hero_cta_primary": "Start a project",
+    "hero_cta_secondary": "See selected work",
+    "hero_portrait_url": "",
+    "label_about": "About",
+    "label_skills": "Skills",
+    "label_experiences": "Experience",
+    "label_works": "Work",
+    "label_testimonials": "Testimonials",
+    "label_contact": "Contact",
+    "about_heading": "A designer who likes the awkward middle of a problem",
+    "about_intro": "I've spent the last decade helping small teams find the shape of what they're building. Most of that work happens before anything looks like design — in the questions, the constraints, and the things nobody wants to say out loud.",
+    "skills_heading": "What I work with",
+    "skills_intro": "Tools change. The habit of asking better questions doesn't.",
+    "experiences_heading": "Where I've been",
+    "experiences_intro": "A decade of studios, in-house teams, and the occasional useful detour.",
+    "works_heading": "Selected work",
+    "works_intro": "A few projects that show how I think, not just what I shipped.",
+    "testimonials_heading": "Kind words",
+    "testimonials_intro": "The people I've worked alongside, in their own words.",
+    "contact_heading": "Let's talk about it",
+    "contact_intro": "Tell me what you're working on. I read everything and reply within a couple of days.",
+    "contact_email": "hello@example.com",
+    "contact_location": "Lisbon, Portugal",
+    "contact_channels": [
+      {
+        "label": "Message on WhatsApp",
+        "url": "https://wa.me/15550000000",
+        "primary": true
+      },
+      {
+        "label": "Email",
+        "url": "mailto:hello@example.com"
+      },
+      {
+        "label": "Telegram",
+        "url": "https://t.me/example"
+      }
+    ],
+    "contact_form_label": "Prefer to write something longer? Send it here and it lands in my inbox.",
+    "contact_submit_label": "Send message",
+    "social_links": [
+      {
+        "label": "LinkedIn",
+        "url": "https://example.com"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://example.com"
+      },
+      {
+        "label": "Are.na",
+        "url": "https://example.com"
+      }
+    ],
+    "footer_note": "Built with care. Available for selected projects."
+  },
+  "skills": [
+    {
+      "name": "Brand identity"
+    },
+    {
+      "name": "Product design"
+    },
+    {
+      "name": "Design systems"
+    },
+    {
+      "name": "Art direction"
+    },
+    {
+      "name": "Typography"
+    },
+    {
+      "name": "Print & editorial"
+    },
+    {
+      "name": "Prototyping"
+    },
+    {
+      "name": "Workshop facilitation"
+    }
+  ],
+  "experiences": [
+    {
+      "title": "Independent Designer",
+      "org": "Self-employed",
+      "start_date": "2021-03-01"
+    },
+    {
+      "title": "Senior Designer",
+      "org": "Northbound Studio",
+      "start_date": "2018-01-01"
+    },
+    {
+      "title": "Designer",
+      "org": "Field & Form",
+      "start_date": "2015-06-01"
+    },
+    {
+      "title": "BA, Graphic Design",
+      "org": "Central Institute of Art",
+      "start_date": "2011-09-01"
+    }
+  ],
+  "works": [
+    {
+      "title": "Meridian",
+      "external_url": "https://example.com"
+    },
+    {
+      "title": "Slow Press",
+      "external_url": "https://example.com"
+    },
+    {
+      "title": "Harbour",
+      "external_url": "https://example.com"
+    },
+    {
+      "title": "Fold",
+      "external_url": "https://example.com"
+    },
+    {
+      "title": "Common Ground",
+      "external_url": "https://example.com"
+    },
+    {
+      "title": "Ledger",
+      "external_url": "https://example.com"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Priya Raman",
+      "quote": "Mara asked the question everyone had been avoiding for six months, and the project got simpler that afternoon."
+    },
+    {
+      "name": "Tomas Beier",
+      "quote": "The system she built is still the thing our team argues least about. That is the highest praise I have."
+    },
+    {
+      "name": "Aoife Donnelly",
+      "quote": "Careful, fast, and honest about tradeoffs. She told us not to build something once, and she was right."
+    },
+    {
+      "name": "Julian Mbeki",
+      "quote": "Working with Mara felt less like hiring a designer and more like adding someone who cared about the outcome."
+    }
+  ],
+  "stats": [
+    {
+      "label": "Years designing",
+      "number": "10+"
+    },
+    {
+      "label": "Projects shipped",
+      "number": "40"
+    },
+    {
+      "label": "Teams supported",
+      "number": "18"
+    },
+    {
+      "label": "Repeat clients",
+      "number": "70%"
+    }
+  ]
+}

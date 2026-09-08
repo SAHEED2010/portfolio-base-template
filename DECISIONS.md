@@ -260,6 +260,45 @@ the reasoning.
   focus pausing cover mouse and keyboard but **not touch**, so a
   visible button is required rather than optional. Falls back to a
   plain scroller under `prefers-reduced-motion`.
+- **2026-09-09 — `site_settings.value` is nullable, not `NOT NULL`**:
+  a JSON `null` in a PostgREST update body always maps to SQL `NULL`
+  for that column — there is no way to send "store the JSON null
+  literal" separately from "clear this column" over that wire format.
+  With the column `NOT NULL`, every attempt to clear an optional
+  setting silently failed the constraint. Matches the settled
+  semantics directly ("optional keys are nullable") rather than
+  fighting them; `settingString`/`settingArray` already treat `null`
+  as absent, so no component changed.
+- **2026-09-09 — `site_settings` field map is canonical, not
+  per-fork**: how a key is edited (text / textarea / list / image) is
+  a property of the schema, not of the client — two forks editing
+  `hero_phrases` get the identical control. A fork extends the map
+  when it adds a setting; it never rewrites an existing entry. A key
+  present in the database but absent from the map still renders — as
+  a plain text field with a console warning — rather than vanishing.
+- **2026-09-09 — Structural vs optional keys**: `site_title`,
+  `hero_name`, and the six `label_*` keys block a blank save with a
+  clear message — they hold up the page's own scaffolding (H1, nav,
+  browser tab), not content a section can simply omit. Every other
+  key is optional: nullable, and the public site skips rendering it
+  rather than emitting an empty element.
+- **2026-09-09 — No render-time fallback copy**: a blank field reads
+  as blank on the public site, never silently replaced by template
+  text (e.g. `settingString(settings, "site_title", "Portfolio")`
+  would let a fork ship to a client still showing "Portfolio"
+  somewhere nobody noticed). Two such fallbacks were removed from
+  `layout.tsx`/`page.tsx` when this was written.
+- **2026-09-09 — Seed content is realistic, not placeholder-shaped,
+  with a drift check as the safety net**: "Mara Ellison" and a
+  project called "Meridian" make the base look like a finished site
+  rather than an empty shell — but realism is exactly what lets
+  seeded content survive to launch unnoticed, unlike an obvious
+  "Sample Project 1". `scripts/generate-seed-manifest.mjs` derives
+  `scripts/seed-manifest.json` from `seed.sql` (generated, not
+  hand-duplicated, so the two can't drift apart);
+  `scripts/check-seed-drift.mjs` compares live content against it and
+  flags anything unchanged. Required, not optional, before a fork
+  launches — `FORKING.md` §10.
 - **2026-09-08 — RLS smoke tests use plain `fetch` against PostgREST,
   not `@supabase/supabase-js`**: no extra dependency, and it exercises
   the same HTTP path the app uses, so RLS is observed directly rather

@@ -25,8 +25,12 @@ const inter = Inter({
 // of the static `metadata` export.
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
-  const title = settingString(settings, "site_title", "Portfolio");
-  const description = settingString(settings, "seo_description", "");
+  // No render-time fallback text: site_title is a structural key that
+  // the studio blocks from saving blank, so it should never actually
+  // be empty in practice. A fallback like "Portfolio" here would be
+  // template copy that could silently ship to a client's live site.
+  const title = settingString(settings, "site_title");
+  const description = settingString(settings, "seo_description");
 
   return {
     title,

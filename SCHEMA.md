@@ -29,7 +29,7 @@ CALLED for this client), SEO fields, social links, contact details.
 | column       | type          | notes                              |
 |--------------|---------------|-------------------------------------|
 | `key`        | text          | primary key                        |
-| `value`      | jsonb         | string, array, or object — see below |
+| `value`      | jsonb, nullable | string, array, object, or SQL NULL — see below |
 | `created_at` | timestamptz   |                                     |
 | `updated_at` | timestamptz   |                                     |
 
@@ -37,6 +37,17 @@ CALLED for this client), SEO fields, social links, contact details.
 rotating phrases are a JSON array of strings, a setting that ever
 needs structure (e.g. a social-links object) is a JSON object — no
 schema change when a setting's shape changes.
+
+**Nullable, not the JSON `null` literal.** An optional key that's
+blank stores SQL `NULL`, not a `'null'::jsonb` value — those two are
+indistinguishable in a PostgREST update body (a JSON `null` in the
+request always maps to SQL `NULL`), so a `NOT NULL` column and "store
+JSON null to mean blank" cannot coexist; the column was `NOT NULL`
+until `20260909000000_site_settings_value_nullable.sql` fixed this
+after it silently broke every attempt to clear an optional setting.
+`settingString`/`settingArray` (`src/lib/settings.ts`) already treat
+`null` the same as any other non-matching type — fallback, no
+component change needed.
 
 RLS: public SELECT. Authenticated INSERT/UPDATE/DELETE.
 

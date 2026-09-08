@@ -56,7 +56,7 @@ export default async function Home() {
   return (
     <>
       <SiteHeader
-        siteTitle={settingString(settings, "site_title", "Portfolio")}
+        siteTitle={settingString(settings, "site_title")}
         items={navItems}
       />
       <main>

@@ -69,11 +69,13 @@ SUPABASE_SERVICE_ROLE_KEY=<service role> \
 # same env vars
   node scripts/storage-smoke-test.mjs  # expect 5/5
 
-# and, with the app running (APP_URL defaults to 127.0.0.1:3000)
-  node scripts/studio-smoke-test.mjs   # expect 5/5
+# and, with the app running (APP_URL defaults to 127.0.0.1:3000) —
+# this one provisions and cleans up its own throwaway admin user, so
+# it doesn't need step 6's real users to exist yet
+  node scripts/studio-smoke-test.mjs   # expect 16/16
 ```
 
-Do not continue on anything less than 10/10, 5/5 and 5/5.
+Do not continue on anything less than 10/10, 5/5 and 16/16.
 
 ## 4. Seed starting content
 
@@ -207,12 +209,43 @@ a quiet portfolio 500 on the first visit after a lull. Add a weekly
 Vercel cron that pings the DB (`DECISIONS.md`, Accounts and
 ownership).
 
-## 10. Hand over
+## 10. Replace every seeded default — REQUIRED before launch
+
+`supabase/seed.sql` is written to be **realistic** on purpose — a
+real-sounding designer persona, plausible project titles, a genuine
+client quote — so the base looks like a finished site rather than an
+empty shell while you're building it (`DECISIONS.md`). That realism
+is exactly what makes it dangerous at launch: unlike "Sample Project
+1", nothing about it *looks* wrong, so a seeded row can go live
+unnoticed.
+
+Don't rely on eyeballing it. Run the check:
+
+```bash
+SUPABASE_URL=<project url> \
+SUPABASE_ANON_KEY=<anon> \
+  node scripts/check-seed-drift.mjs
+```
+
+It compares every `site_settings` key and every row in the six content
+tables against `scripts/seed-manifest.json` (generated from
+`seed.sql`) and flags anything still holding its exact seeded value —
+"Mara Ellison" in `hero_name`, "Meridian" still in `works`, and so on.
+
+- [ ] `check-seed-drift.mjs` reports **zero** flagged items
+- [ ] If `seed.sql` was hand-edited for this fork instead of replaced
+      through the studio, regenerate the manifest first:
+      `node scripts/generate-seed-manifest.mjs`
+
+Do not hand over to the client while this check reports anything.
+
+## 11. Hand over
 
 - [ ] Client can sign in at `/studio`
 - [ ] Client has edited one thing successfully while you watch
 - [ ] They know password resets go through you
 - [ ] Support account works
+- [ ] `check-seed-drift.mjs` is clean (step 10)
 
 ---
 
