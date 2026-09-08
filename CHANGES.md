@@ -12,6 +12,52 @@ to care**.
 
 ---
 
+## 2026-09-09 — Studio: auth, shell, and works CRUD
+
+Commits `7387b65`, `99c571a`, `0e18029`, `51c1206`, `393366d`.
+
+### Added
+
+- `/studio` behind Supabase Auth (`@supabase/ssr`), anon key only —
+  no service-role key anywhere in the app
+- Middleware refreshes the session and gate-keeps `/studio/*`, scoped
+  so the public site stays statically prerendered
+- Works CRUD end to end, plus the three pieces the remaining screens
+  reuse: `image-upload.tsx`, `use-unsaved-changes.ts`,
+  `reorder-controls.tsx` + `lib/reorder.ts`
+- `scripts/studio-smoke-test.mjs` — 5 assertions, self-cleaning
+
+### Security — forks MUST act on this
+
+- **`enable_signup` was `true`.** Write policies grant to the
+  `authenticated` role, so anyone could self-register into write
+  access on all six content tables. Now `false` under `[auth]`.
+- **Leave `[auth.email] enable_signup = true`** — despite the name it
+  maps to `EXTERNAL_EMAIL_ENABLED` and disables email *login*, locking
+  every user out.
+- The hosted project has its own signup setting **and** its own OAuth
+  providers, neither governed by `config.toml`. `FORKING.md` §5.
+
+### Bugs fixed (worth knowing if you fork an earlier commit)
+
+- **Edit forms never reached the server.** Wrapping
+  `useActionState`'s dispatch in an arrow function turns the form into
+  a client action; React renders
+  `action="javascript:throw …"` and the submit is silently dropped.
+  Pass `formAction` directly. Guarded by the studio smoke test.
+- **Signed-in users were bounced to the login page.** Middleware
+  returned bare redirects, discarding the rotated auth cookies, so the
+  browser kept a token the server had already invalidated.
+- **The login page rendered inside the signed-in chrome.** Fixed with
+  an `(app)` route group; URLs unchanged.
+- **Both smoke tests used to leave their rows behind** — which mattered
+  because `FORKING.md` runs them against the client's live project.
+  All three now clean up.
+
+**Forks: re-run all three smoke tests (10/10, 5/5, 5/5).**
+
+---
+
 ## 2026-09-09 — Phase 1 foundations
 
 Commit `0401659` — first commit. Everything below is the initial base;
@@ -55,7 +101,7 @@ form.
 
 ### Known gaps at this commit
 
-- `/studio` admin does not exist yet
+- `/studio` admin did not exist yet at this commit (added later the same day — see the entry above)
 - `src/app/favicon.ico` is still the stock Next.js icon — replace per
   `FORKING.md` §7
 - No Open Graph image ships with the base
