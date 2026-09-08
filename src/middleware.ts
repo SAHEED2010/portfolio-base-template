@@ -48,19 +48,34 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLogin = pathname === "/studio/login";
 
+  // Any response we return INSTEAD of `response` must carry the
+  // refreshed auth cookies across.
+  //
+  // getUser() rotates the refresh token: the old one is invalidated
+  // on the auth server and the replacement is written to
+  // `response.cookies` by setAll above. Returning a bare
+  // NextResponse.redirect() throws those away, so the browser keeps a
+  // token the server has already killed — and every later request
+  // fails auth and bounces to login, even though the user just signed
+  // in. That was the "asked me to sign in again" bug.
+  const carryCookies = (target: NextResponse) => {
+    response.cookies.getAll().forEach((cookie) => target.cookies.set(cookie));
+    return target;
+  };
+
   if (!user && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/studio/login";
     // Remember where they were headed so login can return them there.
     url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
+    return carryCookies(NextResponse.redirect(url));
   }
 
   if (user && isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/studio";
     url.search = "";
-    return NextResponse.redirect(url);
+    return carryCookies(NextResponse.redirect(url));
   }
 
   return response;

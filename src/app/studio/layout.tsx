@@ -1,33 +1,22 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
-import { StudioNav } from "./studio-nav";
+
+// Metadata only — no chrome and no auth check here.
+//
+// The sidebar lives in (app)/layout.tsx so it wraps the authenticated
+// routes ONLY. /studio/login is a sibling of that group, so the sign-in
+// page no longer renders inside the signed-in shell.
 
 export const metadata: Metadata = {
   title: { default: "Studio", template: "%s · Studio" },
+  // The studio must never be indexed. Obscurity is not the security
+  // layer — RLS is — but there's no reason for it to be searchable.
   robots: { index: false, follow: false },
 };
 
-export default async function StudioLayout({
+export default function StudioLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // The login page renders through this layout too, so it must be
-  // able to render without a user — bail out to plain children rather
-  // than showing a signed-out chrome.
-  if (!user) {
-    return <>{children}</>;
-  }
-
-  return (
-    <div className="flex min-h-[100svh] flex-col bg-neutral-100 lg:flex-row">
-      <StudioNav email={user.email ?? ""} />
-      <main className="min-w-0 flex-1 bg-neutral-50">{children}</main>
-    </div>
-  );
+  return <>{children}</>;
 }
