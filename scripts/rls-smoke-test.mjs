@@ -224,6 +224,43 @@ for (const table of PUBLIC_READ_TABLES) {
 }
 
 // ---------------------------------------------------------------
+// Clean up every row this run created.
+//
+// Not optional housekeeping: FORKING.md has you run this against the
+// CLIENT'S live project to verify their RLS. Without cleanup, that
+// check would leave "smoke-…" cards on a real portfolio.
+//
+// Runs as service_role because anon deliberately cannot delete most
+// of this — that's the property the test just proved.
+// ---------------------------------------------------------------
+async function cleanup() {
+  const targets = [
+    ["site_settings", "key"],
+    ["skills", "name"],
+    ["experiences", "title"],
+    ["works", "title"],
+    ["testimonials", "name"],
+    ["stats", "label"],
+    ["contact_messages", "name"],
+  ];
+
+  for (const [table, column] of targets) {
+    const r = await req(
+      "DELETE",
+      `${table}?${column}=like.${encodeURIComponent(`${MARK}*`)}`,
+      { key: SERVICE_KEY },
+    );
+    if (r.status !== 204 && r.status !== 200) {
+      console.warn(`  ! cleanup of ${table} returned HTTP ${r.status}`);
+    }
+  }
+}
+
+console.log("\n--- cleanup ---");
+await cleanup();
+console.log(`removed rows tagged ${MARK}`);
+
+// ---------------------------------------------------------------
 const failed = results.filter((r) => !r.passed);
 console.log(
   `\n${results.length - failed.length}/${results.length} assertions passed`,

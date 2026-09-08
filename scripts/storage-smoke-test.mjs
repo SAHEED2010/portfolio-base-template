@@ -207,6 +207,68 @@ console.log("\n--- assertions ---");
 }
 
 // ---------------------------------------------------------------
+// Clean up: remove uploaded objects and the throwaway user.
+// FORKING.md runs this against the client's live project, so it must
+// not leave files in their bucket or a stray account in their auth.
+// ---------------------------------------------------------------
+console.log("\n--- cleanup ---");
+{
+  const list = await fetch(`${URL_BASE}/storage/v1/object/list/${BUCKET}`, {
+    method: "POST",
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ prefix: MARK, limit: 100 }),
+  });
+
+  const files = list.ok ? await list.json() : [];
+  const paths = (Array.isArray(files) ? files : []).map(
+    (f) => `${MARK}/${f.name}`,
+  );
+
+  if (paths.length > 0) {
+    const removed = await fetch(`${URL_BASE}/storage/v1/object/${BUCKET}`, {
+      method: "DELETE",
+      headers: {
+        apikey: SERVICE_KEY,
+        Authorization: `Bearer ${SERVICE_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prefixes: paths }),
+    });
+    console.log(
+      `removed ${paths.length} object(s) under ${MARK}/ (HTTP ${removed.status})`,
+    );
+  } else {
+    console.log(`no objects found under ${MARK}/`);
+  }
+
+  // The test user was created only to prove authenticated upload.
+  const users = await fetch(`${URL_BASE}/auth/v1/admin/users`, {
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+  });
+  if (users.ok) {
+    const { users: list2 = [] } = await users.json();
+    const created = list2.find((u) => u.email === TEST_EMAIL);
+    if (created) {
+      const del = await fetch(
+        `${URL_BASE}/auth/v1/admin/users/${created.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+          },
+        },
+      );
+      console.log(`removed test user ${TEST_EMAIL} (HTTP ${del.status})`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------
 const failed = results.filter((r) => !r.passed);
 console.log(
   `\n${results.length - failed.length}/${results.length} assertions passed`,

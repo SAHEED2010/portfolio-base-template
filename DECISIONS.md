@@ -150,6 +150,32 @@ the reasoning.
   depth. The browser-side compression cap rejects oversize files with
   a friendly error; the bucket rejects them even if that layer is
   bypassed.
+- **2026-09-09 — Storage object lifecycle**: path is
+  `<folder>/<uuid>.<ext>` (random name — no collisions, no leaked
+  client filenames, no unicode/space handling). The row stores the
+  full public URL, so cleanup derives the object path back out of it;
+  a URL that isn't ours parses to null and is never deleted.
+  - **Replacing an image deletes the old object.**
+  - **Deleting a row deletes its object.**
+  - Both are **best effort** — a failed cleanup logs a warning and
+    never blocks the user's save. A leaked object is annoying; a save
+    that fails because cleanup failed is worse.
+  - **Accepted V1 gap:** uploading an image and then abandoning the
+    form without saving orphans that object. Closing it would mean
+    deferring upload until submit (losing instant preview) or a
+    scheduled sweep. Neither is worth it at ~15 images per site; if a
+    fork ever needs it, the sweep is "list bucket, delete anything no
+    row references".
+- **2026-09-09 — Reordering rewrites the whole list, not a two-row
+  swap**: swapping only works when `display_order` is already a clean
+  sequence. Once duplicates or gaps exist — a failed write, a manual
+  DB edit, rows sharing the default 0 — a swap either does nothing
+  visible or moves the wrong row. Rewriting 1..n on every move is
+  self-healing, and these lists hold single digits of rows.
+- **2026-09-09 — Smoke tests clean up after themselves**: FORKING.md
+  has you run them against the CLIENT'S live project, so leaving
+  rows behind would put "smoke-…" cards on a real portfolio. Found
+  after 4 runs had accumulated junk in every content table.
 - **2026-09-08 — MIME allow-list: jpeg, png, webp only**: `image/svg+xml`
   excluded because SVG is an XSS vector on user upload; `image/gif`
   excluded as large, animated, and rarely wanted on a portfolio.
