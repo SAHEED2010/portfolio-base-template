@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Add stat" };
 export default function NewStatPage() {
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Add stat
       </h1>
       <div className="mt-8">

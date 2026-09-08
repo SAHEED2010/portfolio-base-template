@@ -14,16 +14,16 @@ export function SiteFooter({ settings }: { settings: SettingsMap }) {
   const socials = settingArray<SocialLink>(settings, "social_links");
 
   return (
-    <footer className="border-t border-neutral-200">
+    <footer className="border-t border-border">
       <div
         className="mx-auto flex w-full flex-col gap-6 py-12 text-center md:flex-row md:items-center md:justify-between md:text-left"
         style={{ maxWidth: "var(--measure)", paddingInline: "var(--gutter)" }}
       >
         <div>
           {title && (
-            <p className="font-display text-base text-primary">{title}</p>
+            <p className="font-display text-base text-ink">{title}</p>
           )}
-          {note && <p className="mt-1 text-sm text-neutral-500">{note}</p>}
+          {note && <p className="mt-1 text-sm text-muted">{note}</p>}
         </div>
 
         <div className="flex flex-col items-center gap-4 md:items-end">
@@ -35,7 +35,7 @@ export function SiteFooter({ settings }: { settings: SettingsMap }) {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-underline inline-flex min-h-[44px] items-center text-sm text-neutral-500 hover:text-accent"
+                  className="link-underline inline-flex min-h-[44px] items-center text-sm text-muted hover:text-accent"
                 >
                   {social.label}
                 </a>

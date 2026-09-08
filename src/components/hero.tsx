@@ -129,7 +129,7 @@ export function Hero({ settings }: { settings: SettingsMap }) {
               >
                 {/* The fine rule that anchors the top of the column. */}
                 <span aria-hidden className="h-px w-8 bg-accent" />
-                <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+                <p className="text-xs uppercase tracking-[0.22em] text-muted">
                   {greeting}
                 </p>
               </div>
@@ -155,7 +155,7 @@ export function Hero({ settings }: { settings: SettingsMap }) {
 
             {intro && (
               <p
-                className="animate-rise mt-6 max-w-xl text-lg leading-relaxed text-neutral-600"
+                className="animate-rise mt-6 max-w-xl text-lg leading-relaxed text-muted"
                 style={{ animationDelay: "280ms" }}
               >
                 {intro}
@@ -186,7 +186,7 @@ export function Hero({ settings }: { settings: SettingsMap }) {
                 // action clearly wins the hierarchy.
                 <a
                   href="#works"
-                  className="tap inline-flex min-h-11 items-center justify-center rounded-full border border-neutral-200 px-7 py-3.5 text-sm font-medium text-neutral-700 transition-colors duration-200 hover:border-neutral-400 hover:text-primary"
+                  className="tap inline-flex min-h-11 items-center justify-center rounded-full border border-border px-7 py-3.5 text-sm font-medium text-neutral-700 transition-colors duration-200 hover:border-neutral-400 hover:text-ink"
                 >
                   {ctaSecondary}
                 </a>
@@ -204,7 +204,7 @@ export function Hero({ settings }: { settings: SettingsMap }) {
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="link-underline inline-flex min-h-11 items-center text-sm text-neutral-500 hover:text-accent"
+                    className="link-underline inline-flex min-h-11 items-center text-sm text-muted hover:text-accent"
                   >
                     {social.label}
                   </a>

@@ -28,14 +28,14 @@ export default async function SettingsPage() {
     <StudioPage>
       <div className="flex items-center gap-3">
         <span aria-hidden className="h-px w-8 bg-accent" />
-        <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+        <p className="text-xs uppercase tracking-[0.22em] text-muted">
           Site content
         </p>
       </div>
-      <h1 className="font-display mt-5 text-3xl tracking-tight text-primary">
+      <h1 className="font-display mt-5 text-3xl tracking-tight text-ink">
         Everything visitors read
       </h1>
-      <p className="mt-2 max-w-xl text-base text-neutral-600">
+      <p className="mt-2 max-w-xl text-base text-muted">
         Headings, intros, and contact details — grouped by where they appear
         on your site.
       </p>
@@ -45,13 +45,13 @@ export default async function SettingsPage() {
           <li key={group.id}>
             <Link
               href={`/studio/settings/${group.id}`}
-              className="group block rounded-xl border border-neutral-200 bg-white p-5 transition-colors hover:border-neutral-300"
+              className="group block rounded-xl border border-border bg-surface p-5 transition-colors hover:border-neutral-300"
             >
-              <p className="text-base font-medium text-primary transition-colors group-hover:text-accent">
+              <p className="text-base font-medium text-ink transition-colors group-hover:text-accent">
                 {group.label}
               </p>
               {group.description && (
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-muted">
                   {group.description}
                 </p>
               )}
@@ -61,11 +61,11 @@ export default async function SettingsPage() {
       </ul>
 
       {unmapped.length > 0 && (
-        <div className="mt-12 border-t border-neutral-200 pt-10">
-          <h2 className="font-display text-xl text-primary">
+        <div className="mt-12 border-t border-border pt-10">
+          <h2 className="font-display text-xl text-ink">
             Other settings
           </h2>
-          <p className="mt-1 max-w-xl text-sm text-neutral-500">
+          <p className="mt-1 max-w-xl text-sm text-muted">
             These keys exist but aren&apos;t part of a curated group yet.
             Edited as plain text here in the meantime.
           </p>

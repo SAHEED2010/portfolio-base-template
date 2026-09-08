@@ -27,7 +27,7 @@ function MoveButton({
       disabled={disabled || pending}
       aria-label={label}
       title={label}
-      className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500 transition-colors hover:border-neutral-400 hover:text-primary disabled:cursor-not-allowed disabled:opacity-30"
+      className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:border-neutral-400 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
     >
       <span aria-hidden>{direction === "up" ? "↑" : "↓"}</span>
     </button>

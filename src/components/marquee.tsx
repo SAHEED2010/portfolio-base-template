@@ -52,7 +52,7 @@ export function Marquee({
           aria-label={paused ? playLabel : pauseLabel}
           // Icon-only and quiet, but a real 44px target. Hairline
           // border + accent mark matches the language used elsewhere.
-          className="tap flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-neutral-400 transition-colors duration-200 hover:border-white/30 hover:text-neutral-50"
+          className="tap flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-anchor-muted transition-colors duration-200 hover:border-white/30 hover:text-anchor-fg"
         >
           {paused ? (
             // Play: a small triangle.

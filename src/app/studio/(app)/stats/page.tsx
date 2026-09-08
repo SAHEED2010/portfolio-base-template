@@ -41,15 +41,15 @@ export default async function StatsPage() {
           {stats.map((stat, index) => (
             <li
               key={stat.id}
-              className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-3"
+              className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3"
             >
-              <span className="font-display w-16 shrink-0 pl-1 text-2xl tracking-tight text-primary">
+              <span className="font-display w-16 shrink-0 pl-1 text-2xl tracking-tight text-ink">
                 {stat.number}
               </span>
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/studio/stats/${stat.id}`}
-                  className="link-underline text-base text-neutral-600 hover:text-accent"
+                  className="link-underline text-base text-muted hover:text-accent"
                 >
                   {stat.label}
                 </Link>

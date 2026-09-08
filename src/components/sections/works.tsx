@@ -66,11 +66,11 @@ export function Works({
 
               <div className="mt-5 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="font-display text-xl tracking-tight text-primary transition-colors duration-200 group-hover:text-accent sm:text-2xl">
+                  <h3 className="font-display text-xl tracking-tight text-ink transition-colors duration-200 group-hover:text-accent sm:text-2xl">
                     {work.title}
                   </h3>
                   {work.subtitle && (
-                    <p className="mt-1.5 text-sm text-neutral-500">
+                    <p className="mt-1.5 text-sm text-muted">
                       {work.subtitle}
                     </p>
                   )}

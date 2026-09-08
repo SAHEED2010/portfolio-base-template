@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Add experience" };
 export default function NewExperiencePage() {
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Add experience
       </h1>
       <div className="mt-8">

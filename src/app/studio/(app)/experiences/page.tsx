@@ -42,7 +42,7 @@ export default async function ExperiencesPage() {
           {experiences.map((item, index) => (
             <li
               key={item.id}
-              className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-3"
+              className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-100">
                 {item.logo_url ? (
@@ -65,11 +65,11 @@ export default async function ExperiencesPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/studio/experiences/${item.id}`}
-                  className="link-underline text-base font-medium text-primary hover:text-accent"
+                  className="link-underline text-base font-medium text-ink hover:text-accent"
                 >
                   {item.title}
                 </Link>
-                <p className="truncate text-sm text-neutral-500">
+                <p className="truncate text-sm text-muted">
                   {item.org} · {formatDateRange(item.start_date, item.end_date)}
                 </p>
               </div>

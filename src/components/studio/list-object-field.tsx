@@ -45,11 +45,11 @@ export function ListObjectField({
       {items.map((item, i) => (
         <div
           key={i}
-          className="flex flex-col gap-3 rounded-xl border border-neutral-200 p-4"
+          className="flex flex-col gap-3 rounded-xl border border-border p-4"
         >
           {fields.map((field) => (
             <div key={field.name}>
-              <label className="block text-xs text-neutral-500">
+              <label className="block text-xs text-muted">
                 {field.label}
               </label>
               {field.type === "checkbox" ? (
@@ -80,7 +80,7 @@ export function ListObjectField({
           <button
             type="button"
             onClick={() => update(items.filter((_, idx) => idx !== i))}
-            className="tap self-start text-sm text-neutral-500 transition-colors hover:text-red-700"
+            className="tap self-start text-sm text-muted transition-colors hover:text-red-700"
           >
             Remove
           </button>
@@ -99,7 +99,7 @@ export function ListObjectField({
             Object.fromEntries(fields.map((f) => [f.name, f.type === "checkbox" ? false : ""])),
           ])
         }
-        className="tap inline-flex min-h-11 w-fit items-center rounded-full border border-neutral-200 px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-primary"
+        className="tap inline-flex min-h-11 w-fit items-center rounded-full border border-border px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-ink"
       >
         {itemLabel}
       </button>

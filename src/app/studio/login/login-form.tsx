@@ -7,7 +7,7 @@ import { signIn, type LoginState } from "../auth-actions";
 const initialState: LoginState = { status: "idle" };
 
 const fieldClass =
-  "w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base text-primary transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,7 +30,7 @@ export function LoginForm({ next }: { next: string }) {
       <input type="hidden" name="next" value={next} />
 
       <div>
-        <label htmlFor="email" className="block text-sm text-neutral-600">
+        <label htmlFor="email" className="block text-sm text-muted">
           Email
         </label>
         <input
@@ -51,7 +51,7 @@ export function LoginForm({ next }: { next: string }) {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm text-neutral-600">
+        <label htmlFor="password" className="block text-sm text-muted">
           Password
         </label>
         <input

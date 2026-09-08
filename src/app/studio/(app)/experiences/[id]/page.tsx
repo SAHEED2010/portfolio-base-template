@@ -25,7 +25,7 @@ export default async function EditExperiencePage({
 
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Edit experience
       </h1>
       <div className="mt-8">

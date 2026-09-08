@@ -53,7 +53,7 @@ export function Testimonials({
   return (
     <section
       id="testimonials"
-      className="bg-primary"
+      className="bg-anchor"
       style={{ paddingBlock: "var(--section-y)" }}
     >
       <div
@@ -92,7 +92,7 @@ export function Testimonials({
                 {t.rating !== null && <RatingDots rating={t.rating} />}
 
                 <blockquote
-                  className={`font-display text-xl leading-snug text-neutral-50 lg:text-2xl ${
+                  className={`font-display text-xl leading-snug text-anchor-fg lg:text-2xl ${
                     t.rating !== null ? "mt-6" : ""
                   }`}
                 >
@@ -109,12 +109,12 @@ export function Testimonials({
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <span aria-hidden className="text-sm text-neutral-400">
+                      <span aria-hidden className="text-sm text-anchor-muted">
                         {initialsFrom(t.name)}
                       </span>
                     )}
                   </span>
-                  <span className="text-sm text-neutral-400">{t.name}</span>
+                  <span className="text-sm text-anchor-muted">{t.name}</span>
                 </figcaption>
               </figure>
           )),

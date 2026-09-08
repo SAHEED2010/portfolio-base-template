@@ -28,7 +28,7 @@ export default async function StudioAppLayout({
   return (
     <div className="flex min-h-[100svh] flex-col bg-neutral-100 lg:flex-row">
       <StudioNav email={user.email ?? ""} />
-      <main className="min-w-0 flex-1 bg-neutral-50">{children}</main>
+      <main className="min-w-0 flex-1 bg-page">{children}</main>
     </div>
   );
 }

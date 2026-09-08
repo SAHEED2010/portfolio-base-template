@@ -20,7 +20,7 @@ export default async function EditStatPage({
 
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Edit stat
       </h1>
       <div className="mt-8">

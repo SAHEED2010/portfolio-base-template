@@ -32,7 +32,7 @@ export function SectionHeader({
             />
             <p
               className={`text-xs uppercase tracking-[0.22em] ${
-                dark ? "text-neutral-400" : "text-neutral-500"
+                dark ? "text-neutral-400" : "text-muted"
               }`}
             >
               {eyebrow}
@@ -45,7 +45,7 @@ export function SectionHeader({
         <Reveal delay={60}>
           <h2
             className={`font-display mt-5 text-balance text-3xl leading-[1.1] tracking-tight sm:text-4xl lg:text-5xl ${
-              dark ? "text-neutral-50" : "text-primary"
+              dark ? "text-neutral-50" : "text-ink"
             }`}
           >
             {heading}
@@ -57,7 +57,7 @@ export function SectionHeader({
         <Reveal delay={120}>
           <p
             className={`mt-4 text-lg leading-relaxed ${
-              dark ? "text-neutral-400" : "text-neutral-600"
+              dark ? "text-neutral-400" : "text-muted"
             }`}
           >
             {intro}

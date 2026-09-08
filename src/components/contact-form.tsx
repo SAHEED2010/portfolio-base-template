@@ -19,7 +19,7 @@ const initialState: ContactFormState = { status: "idle" };
 // the field visibly receives focus, which matters most on mobile
 // where the keyboard covers half the screen.
 const fieldClass =
-  "w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base text-primary shadow-[0_0_0_0_rgba(46,110,104,0)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-neutral-400 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink shadow-[0_0_0_0_rgba(46,110,104,0)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-neutral-400 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -50,8 +50,8 @@ export function ContactForm({ submitLabel }: { submitLabel: string }) {
         aria-live="polite"
         className="rounded-2xl border border-accent/20 bg-accent/5 p-8"
       >
-        <p className="font-display text-2xl text-primary">Message sent</p>
-        <p className="mt-2 text-base text-neutral-600">
+        <p className="font-display text-2xl text-ink">Message sent</p>
+        <p className="mt-2 text-base text-muted">
           Thanks for reaching out — you&apos;ll get a reply within a couple of
           days.
         </p>
@@ -64,7 +64,7 @@ export function ContactForm({ submitLabel }: { submitLabel: string }) {
       <div>
         {/* Visible labels, not placeholder-only: placeholders vanish
             on focus and fail screen readers. */}
-        <label htmlFor="name" className="block text-sm text-neutral-600">
+        <label htmlFor="name" className="block text-sm text-muted">
           Name
         </label>
         <input
@@ -84,7 +84,7 @@ export function ContactForm({ submitLabel }: { submitLabel: string }) {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm text-neutral-600">
+        <label htmlFor="email" className="block text-sm text-muted">
           Email
         </label>
         <input
@@ -108,7 +108,7 @@ export function ContactForm({ submitLabel }: { submitLabel: string }) {
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm text-neutral-600">
+        <label htmlFor="message" className="block text-sm text-muted">
           Message
         </label>
         <textarea

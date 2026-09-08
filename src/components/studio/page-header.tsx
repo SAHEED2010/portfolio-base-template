@@ -22,15 +22,15 @@ export function StudioPageHeader({
       <div>
         <div className="flex items-center gap-3">
           <span aria-hidden className="h-px w-8 bg-accent" />
-          <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted">
             {eyebrow}
           </p>
         </div>
-        <h1 className="font-display mt-5 text-3xl tracking-tight text-primary">
+        <h1 className="font-display mt-5 text-3xl tracking-tight text-ink">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-xl text-base text-neutral-600">
+          <p className="mt-2 max-w-xl text-base text-muted">
             {description}
           </p>
         )}
@@ -60,8 +60,8 @@ export function StudioEmptyState({
 }) {
   return (
     <div className="mt-10 rounded-xl border border-dashed border-neutral-300 p-10 text-center">
-      <p className="text-base text-neutral-600">{title}</p>
-      <p className="mt-1 text-sm text-neutral-500">{consequence}</p>
+      <p className="text-base text-muted">{title}</p>
+      <p className="mt-1 text-sm text-muted">{consequence}</p>
     </div>
   );
 }

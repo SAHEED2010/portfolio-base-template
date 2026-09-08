@@ -36,15 +36,15 @@ export default async function StudioOverview() {
     <div className="mx-auto w-full max-w-4xl px-6 py-10 lg:px-10 lg:py-14">
       <div className="flex items-center gap-3">
         <span aria-hidden className="h-px w-8 bg-accent" />
-        <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+        <p className="text-xs uppercase tracking-[0.22em] text-muted">
           Overview
         </p>
       </div>
 
-      <h1 className="font-display mt-5 text-3xl tracking-tight text-primary">
+      <h1 className="font-display mt-5 text-3xl tracking-tight text-ink">
         Your site
       </h1>
-      <p className="mt-2 max-w-xl text-base text-neutral-600">
+      <p className="mt-2 max-w-xl text-base text-muted">
         Everything visitors see is edited here. Changes appear on the live
         site within a minute.
       </p>
@@ -60,7 +60,7 @@ export default async function StudioOverview() {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="tap inline-flex min-h-11 items-center rounded-full border border-neutral-200 px-6 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:text-primary"
+          className="tap inline-flex min-h-11 items-center rounded-full border border-border px-6 py-3 text-sm font-medium text-neutral-700 transition-colors hover:border-neutral-400 hover:text-ink"
         >
           View live site ↗
         </a>
@@ -71,7 +71,7 @@ export default async function StudioOverview() {
           href="/studio/inbox"
           className="mt-8 flex items-center justify-between rounded-xl border border-accent/25 bg-accent/5 px-5 py-4 transition-colors hover:border-accent/40"
         >
-          <span className="text-sm text-primary">
+          <span className="text-sm text-ink">
             {unread} unread {unread === 1 ? "message" : "messages"}
           </span>
           <span aria-hidden className="text-accent">
@@ -85,12 +85,12 @@ export default async function StudioOverview() {
           <Link
             key={entry.table}
             href={entry.href}
-            className="group rounded-xl border border-neutral-200 bg-white p-5 transition-colors hover:border-neutral-300"
+            className="group rounded-xl border border-border bg-surface p-5 transition-colors hover:border-neutral-300"
           >
-            <p className="font-display text-3xl tracking-tight text-primary">
+            <p className="font-display text-3xl tracking-tight text-ink">
               {entry.count}
             </p>
-            <p className="mt-1 text-sm text-neutral-500 transition-colors group-hover:text-accent">
+            <p className="mt-1 text-sm text-muted transition-colors group-hover:text-accent">
               {entry.label}
             </p>
           </Link>

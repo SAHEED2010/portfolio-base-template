@@ -131,7 +131,7 @@ export function ImageUpload({
 
   return (
     <div>
-      <span className="block text-sm text-neutral-600">{label}</span>
+      <span className="block text-sm text-muted">{label}</span>
 
       {/* The URL travels with the form as a hidden field, so the
           server action reads it like any other input. */}
@@ -139,7 +139,7 @@ export function ImageUpload({
 
       <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-start">
         <div
-          className={`${aspect} w-full max-w-[12rem] shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100`}
+          className={`${aspect} w-full max-w-[12rem] shrink-0 overflow-hidden rounded-xl border border-border bg-neutral-100`}
         >
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -161,7 +161,7 @@ export function ImageUpload({
               type="button"
               onClick={() => inputRef.current?.click()}
               disabled={busy}
-              className="tap inline-flex min-h-11 items-center rounded-full border border-neutral-200 px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-primary disabled:opacity-60"
+              className="tap inline-flex min-h-11 items-center rounded-full border border-border px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-ink disabled:opacity-60"
             >
               {busy ? "Uploading…" : value ? "Replace" : "Upload image"}
             </button>
@@ -170,14 +170,14 @@ export function ImageUpload({
               <button
                 type="button"
                 onClick={handleRemove}
-                className="tap inline-flex min-h-11 items-center rounded-full px-4 text-sm text-neutral-500 transition-colors hover:text-red-700"
+                className="tap inline-flex min-h-11 items-center rounded-full px-4 text-sm text-muted transition-colors hover:text-red-700"
               >
                 Remove
               </button>
             )}
           </div>
 
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-muted">
             {hint ?? "JPEG, PNG or WebP. Large images are compressed automatically."}
           </p>
 

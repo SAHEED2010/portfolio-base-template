@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import { signOut } from "./auth-actions";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Studio navigation.
 //
@@ -49,8 +50,8 @@ export function StudioNav({ email }: { email: string }) {
               className={[
                 "flex min-h-11 items-center rounded-lg px-3 text-sm transition-colors duration-150",
                 active
-                  ? "bg-neutral-200/60 font-medium text-primary"
-                  : "text-neutral-600 hover:bg-neutral-200/40 hover:text-primary",
+                  ? "bg-border/30 font-medium text-ink"
+                  : "text-muted hover:bg-border/20 hover:text-ink",
               ].join(" ")}
             >
               {item.label}
@@ -64,7 +65,7 @@ export function StudioNav({ email }: { email: string }) {
   return (
     <>
       {/* Mobile: a disclosure bar above the content. */}
-      <div className="border-b border-neutral-200 lg:hidden">
+      <div className="border-b border-border lg:hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <button
             type="button"
@@ -76,44 +77,50 @@ export function StudioNav({ email }: { email: string }) {
               aria-hidden
               className={`h-px bg-accent transition-all duration-300 ${open ? "w-3" : "w-6"}`}
             />
-            <span className="text-xs uppercase tracking-[0.22em] text-primary">
+            <span className="text-xs uppercase tracking-[0.22em] text-ink">
               {open ? "Close" : "Menu"}
             </span>
           </button>
 
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="flex min-h-11 items-center text-sm text-neutral-500 transition-colors hover:text-accent"
-            >
-              Sign out
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="flex min-h-11 items-center text-sm text-muted transition-colors hover:text-accent"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
 
         {open && <nav className="px-3 pb-4">{links}</nav>}
       </div>
 
       {/* Desktop: persistent sidebar. */}
-      <aside className="hidden w-60 shrink-0 border-r border-neutral-200 lg:flex lg:flex-col lg:justify-between">
+      <aside className="hidden w-60 shrink-0 border-r border-border lg:flex lg:flex-col lg:justify-between">
         <div className="p-4">
           <div className="flex items-center gap-3 px-3 py-2">
             <span aria-hidden className="h-px w-6 bg-accent" />
-            <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+            <p className="text-xs uppercase tracking-[0.22em] text-muted">
               Studio
             </p>
           </div>
           <nav className="mt-4">{links}</nav>
         </div>
 
-        <div className="border-t border-neutral-200 p-4">
-          <p className="truncate px-3 text-xs text-neutral-500" title={email}>
+        <div className="border-t border-border p-4">
+          <p className="truncate px-3 text-xs text-muted" title={email}>
             {email}
           </p>
+          <div className="mt-3 px-3">
+            <ThemeToggle />
+          </div>
           <form action={signOut} className="mt-1">
             <button
               type="submit"
-              className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm text-neutral-600 transition-colors hover:bg-neutral-200/40 hover:text-primary"
+              className="flex min-h-11 w-full items-center rounded-lg px-3 text-sm text-muted transition-colors hover:bg-border/20 hover:text-ink"
             >
               Sign out
             </button>

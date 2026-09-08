@@ -176,6 +176,49 @@ the reasoning.
   has you run them against the CLIENT'S live project, so leaving
   rows behind would put "smoke-…" cards on a real portfolio. Found
   after 4 runs had accumulated junk in every content table.
+- **2026-09-09 — Dark mode, three-state (system / explicit light /
+  explicit dark), on both the public site and the studio**: colours
+  stay non-editable (`DECISIONS.md` unchanged elsewhere) — this is a
+  second CSS token set switched by `data-theme`, never exposed to
+  `site_settings` or the field map. One `localStorage` key ("theme")
+  covers both surfaces: confirmed, not assumed, that the whole app
+  renders exactly one `<html>` (studio's own layout returns a bare
+  fragment), so there is one origin and one store regardless of which
+  page a visitor hits first, in dev or prod.
+  - No attribute set = system, tracked live by a plain
+    `@media (prefers-color-scheme: dark)` query with zero JS. An
+    explicit choice sets `data-theme` on `<html>`, which always wins
+    over the OS.
+  - The homepage stays `○ Static` — verified in the build output, not
+    assumed. Theme resolution is entirely client-side (inline script
+    reads `localStorage` before paint); nothing touches a cookie or
+    header at request time.
+  - Dark values are picked and contrast-checked on their own
+    (`--color-page #17181A`, `--color-ink #EDEAE4` 14.8:1,
+    `--color-muted #9A9488` 5.9:1, `--color-surface #1E2023`,
+    `--color-accent-text #4F9992` 5.3:1 — plain `--color-accent`
+    fails at 3.0:1 for text-sized use, same problem already solved
+    once for the testimonials band), not inverted from the light
+    palette.
+  - `--color-border` was raised from an initial `#34373B` (1.5:1) to
+    `#6B6E72` (3.19–3.47:1) after checking, not assuming, that every
+    studio surface (list rows, Overview tiles, form inputs) has ZERO
+    shadow and relies on the border alone to separate a white-ish
+    card from an off-white-ish page — a genuinely structural boundary
+    (WCAG 1.4.11), not a decorative divider.
+  - `--color-anchor` + 3 fixed companions (`-fg`, `-muted`, `-accent`)
+    decouple the testimonials dark band from the swappable palette —
+    values unchanged from what was already hardcoded, so the "one
+    break in an otherwise uniform page" (§1.9) survives the rest of
+    the page going dark.
+  - The inline script's no-flash guarantee was verified against the
+    real rendered HTML, not assumed: it does NOT end up textually
+    first in `<head>` (Next.js's own generated tags come first
+    regardless of JSX order) — it stays flash-free because a
+    `<link rel="stylesheet">` only starts an async fetch without
+    blocking the parser, so the synchronous script still runs and
+    sets `data-theme` well before the browser's paint, which actually
+    waits on the stylesheet finishing.
 - **2026-09-08 — MIME allow-list: jpeg, png, webp only**: `image/svg+xml`
   excluded because SVG is an XSS vector on user upload; `image/gif`
   excluded as large, animated, and rarely wanted on a portfolio.

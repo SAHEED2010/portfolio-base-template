@@ -29,7 +29,7 @@ export function Skills({
           Two columns at 768 would leave each name cramped. */}
       <ul className="mt-12 lg:mt-16 lg:grid lg:grid-cols-2 lg:gap-x-16">
         {skills.map((skill, i) => (
-          <li key={skill.id} className="border-b border-neutral-200">
+          <li key={skill.id} className="border-b border-border">
             {/* 40ms rather than the usual 80 — this list is long and
                 80ms per row would visibly drag. */}
             <Reveal delay={i * 40}>
@@ -41,7 +41,7 @@ export function Skills({
                 <span className="text-xs tabular-nums text-neutral-400 transition-colors duration-200 group-hover:text-accent">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="text-lg font-medium text-primary transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 lg:text-xl">
+                <span className="text-lg font-medium text-ink transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1 lg:text-xl">
                   {skill.name}
                 </span>
               </div>

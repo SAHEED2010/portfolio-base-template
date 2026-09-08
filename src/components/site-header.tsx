@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "./theme-toggle";
 
 // Sticky header. Nav labels come from site_settings, so a fork
 // renaming "Work" to "Publications" updates the nav for free.
@@ -57,7 +58,7 @@ export function SiteHeader({
       className={[
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled || menuOpen
-          ? "border-b border-neutral-200/70 bg-neutral-50/85 py-3 backdrop-blur-md"
+          ? "border-b border-border/70 bg-page/85 py-3 backdrop-blur-md"
           : "border-b border-transparent bg-transparent py-5",
       ].join(" ")}
       style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
@@ -71,22 +72,25 @@ export function SiteHeader({
       >
         <a
           href="#top"
-          className="font-display link-underline text-lg tracking-tight text-primary hover:text-accent"
+          className="font-display link-underline text-lg tracking-tight text-ink hover:text-accent"
         >
           {siteTitle}
         </a>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {items.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className="link-underline text-sm text-neutral-600 hover:text-accent"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+        <div className="hidden items-center gap-8 md:flex">
+          <nav className="flex items-center gap-8">
+            {items.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="link-underline text-sm text-muted hover:text-accent"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <ThemeToggle />
+        </div>
 
         {/* Rule + word, not three bars. min-h-11 keeps the tap target
             at the 44px floor even though the mark itself is small. */}
@@ -107,7 +111,7 @@ export function SiteHeader({
               transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
             }}
           />
-          <span className="text-xs uppercase tracking-[0.22em] text-primary">
+          <span className="text-xs uppercase tracking-[0.22em] text-ink">
             {menuOpen ? "Close" : "Menu"}
           </span>
         </button>
@@ -118,14 +122,26 @@ export function SiteHeader({
       <div
         id="mobile-menu"
         className={[
-          "fixed inset-x-0 top-0 -z-10 bg-neutral-50 transition-transform duration-300 md:hidden",
+          "fixed inset-x-0 top-0 -z-10 bg-page transition-transform duration-300 md:hidden",
           menuOpen ? "translate-y-0" : "-translate-y-full",
         ].join(" ")}
         style={{ transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
         aria-hidden={!menuOpen}
       >
+        {/* inert (not just aria-hidden) so the toggle can't be
+            keyboard-tabbed into while the panel is visually offscreen
+            — the same problem the nav links below solve with
+            tabIndex, applied the simpler way since this is one
+            self-contained component rather than a mapped list. */}
+        <div
+          className="pt-24"
+          style={{ paddingInline: "var(--gutter)" }}
+          inert={!menuOpen}
+        >
+          <ThemeToggle />
+        </div>
         <nav
-          className="flex flex-col pb-10 pt-24"
+          className="flex flex-col pb-10 pt-6"
           style={{ paddingInline: "var(--gutter)" }}
         >
           {items.map((item, i) => (
@@ -136,7 +152,7 @@ export function SiteHeader({
               tabIndex={menuOpen ? 0 : -1}
               // Staggered entrance so the list arrives in reading
               // order rather than as one block.
-              className="font-display tap flex min-h-11 items-center py-3 text-2xl text-primary transition-all duration-300 hover:text-accent"
+              className="font-display tap flex min-h-11 items-center py-3 text-2xl text-ink transition-all duration-300 hover:text-accent"
               style={{
                 opacity: menuOpen ? 1 : 0,
                 transform: menuOpen ? "none" : "translateY(-0.5rem)",

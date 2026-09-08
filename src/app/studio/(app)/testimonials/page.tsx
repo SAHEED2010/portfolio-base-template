@@ -42,7 +42,7 @@ export default async function TestimonialsPage() {
           {testimonials.map((item, index) => (
             <li
               key={item.id}
-              className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-3"
+              className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-100">
                 {item.avatar_url ? (
@@ -62,11 +62,11 @@ export default async function TestimonialsPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/studio/testimonials/${item.id}`}
-                  className="link-underline text-base font-medium text-primary hover:text-accent"
+                  className="link-underline text-base font-medium text-ink hover:text-accent"
                 >
                   {item.name}
                 </Link>
-                <p className="truncate text-sm text-neutral-500">{item.quote}</p>
+                <p className="truncate text-sm text-muted">{item.quote}</p>
               </div>
 
               {/* Surfaced in the list because "no rating" is a valid,

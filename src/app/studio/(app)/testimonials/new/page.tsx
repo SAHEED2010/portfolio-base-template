@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Add testimonial" };
 export default function NewTestimonialPage() {
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Add testimonial
       </h1>
       <div className="mt-8">

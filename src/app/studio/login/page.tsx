@@ -20,15 +20,15 @@ export default async function LoginPage({
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3">
           <span aria-hidden className="h-px w-8 bg-accent" />
-          <p className="text-xs uppercase tracking-[0.22em] text-neutral-500">
+          <p className="text-xs uppercase tracking-[0.22em] text-muted">
             Studio
           </p>
         </div>
 
-        <h1 className="font-display mt-5 text-3xl tracking-tight text-primary">
+        <h1 className="font-display mt-5 text-3xl tracking-tight text-ink">
           Sign in
         </h1>
-        <p className="mt-2 text-base text-neutral-600">
+        <p className="mt-2 text-base text-muted">
           Manage your site’s content.
         </p>
 
@@ -38,7 +38,7 @@ export default async function LoginPage({
 
         {/* There is no self-serve reset in V1, so saying so is kinder
             than a dead "forgot password?" link. */}
-        <p className="mt-8 text-sm text-neutral-500">
+        <p className="mt-8 text-sm text-muted">
           Lost your password? There’s no self-serve reset — contact your
           site administrator and they’ll issue a new one.
         </p>

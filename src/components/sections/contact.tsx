@@ -68,7 +68,7 @@ export function Contact({ settings }: { settings: SettingsMap }) {
                     href={channel.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="link-underline inline-flex min-h-11 items-center text-sm text-neutral-600 hover:text-accent"
+                    className="link-underline inline-flex min-h-11 items-center text-sm text-muted hover:text-accent"
                   >
                     {channel.label}
                   </a>
@@ -87,13 +87,13 @@ export function Contact({ settings }: { settings: SettingsMap }) {
             {email && (
               <a
                 href={`mailto:${email}`}
-                className="link-underline inline-flex min-h-11 items-center text-sm text-neutral-500 hover:text-accent"
+                className="link-underline inline-flex min-h-11 items-center text-sm text-muted hover:text-accent"
               >
                 {email}
               </a>
             )}
             {location && (
-              <p className="text-sm text-neutral-500">{location}</p>
+              <p className="text-sm text-muted">{location}</p>
             )}
             {socials.map((social) => (
               <a
@@ -101,7 +101,7 @@ export function Contact({ settings }: { settings: SettingsMap }) {
                 href={social.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="link-underline inline-flex min-h-11 items-center text-sm text-neutral-500 hover:text-accent"
+                className="link-underline inline-flex min-h-11 items-center text-sm text-muted hover:text-accent"
               >
                 {social.label}
               </a>
@@ -115,9 +115,9 @@ export function Contact({ settings }: { settings: SettingsMap }) {
           competing call to action. Narrower than full width because
           long input rows are harder to scan. */}
       <Reveal delay={120}>
-        <div className="mt-14 border-t border-neutral-200 pt-12 lg:mt-16">
+        <div className="mt-14 border-t border-border pt-12 lg:mt-16">
           {formLabel && (
-            <p className="mb-6 max-w-xl text-base text-neutral-600">
+            <p className="mb-6 max-w-xl text-base text-muted">
               {formLabel}
             </p>
           )}

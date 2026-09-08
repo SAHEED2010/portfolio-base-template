@@ -32,7 +32,7 @@ export function Experiences({
           <li
             key={exp.id}
             className={
-              i < experiences.length - 1 ? "border-b border-neutral-200" : ""
+              i < experiences.length - 1 ? "border-b border-border" : ""
             }
           >
             <Reveal delay={i * 80}>
@@ -41,13 +41,13 @@ export function Experiences({
                   appears once there are 12 columns to split. */}
               <div className="grid gap-2 py-8 lg:grid-cols-12 lg:gap-8 lg:py-10">
                 <div className="lg:col-span-3">
-                  <p className="text-sm tabular-nums text-neutral-500">
+                  <p className="text-sm tabular-nums text-muted">
                     {formatDateRange(exp.start_date, exp.end_date)}
                   </p>
                 </div>
 
                 <div className="lg:col-span-9">
-                  <h3 className="font-display text-xl tracking-tight text-primary sm:text-2xl">
+                  <h3 className="font-display text-xl tracking-tight text-ink sm:text-2xl">
                     {exp.title}
                   </h3>
 
@@ -61,7 +61,7 @@ export function Experiences({
                           className="h-5 w-5 rounded-full object-cover"
                         />
                       )}
-                      <span className="text-base text-neutral-600">
+                      <span className="text-base text-muted">
                         {exp.org}
                       </span>
                     </span>
@@ -74,7 +74,7 @@ export function Experiences({
                   </div>
 
                   {exp.description && (
-                    <p className="mt-3 max-w-2xl text-base leading-relaxed text-neutral-600">
+                    <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
                       {exp.description}
                     </p>
                   )}

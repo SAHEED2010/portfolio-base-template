@@ -28,7 +28,7 @@ export function DeleteButton({
       <button
         type="submit"
         aria-label={`Delete ${label}`}
-        className="tap flex h-9 items-center rounded-lg px-3 text-sm text-neutral-500 transition-colors hover:text-red-700"
+        className="tap flex h-9 items-center rounded-lg px-3 text-sm text-muted transition-colors hover:text-red-700"
       >
         Delete
       </button>

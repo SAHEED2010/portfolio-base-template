@@ -29,11 +29,11 @@ export default async function SettingsGroupPage({
 
   return (
     <StudioPage>
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         {group.label}
       </h1>
       {group.description && (
-        <p className="mt-2 max-w-xl text-base text-neutral-600">
+        <p className="mt-2 max-w-xl text-base text-muted">
           {group.description}
         </p>
       )}

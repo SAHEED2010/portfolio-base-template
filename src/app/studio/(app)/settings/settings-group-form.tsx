@@ -50,11 +50,11 @@ export function SettingsGroupForm({
           const value = Array.isArray(raw) ? (raw as string[]) : [];
           return (
             <div key={field.key}>
-              <span className="block text-sm text-neutral-600">
+              <span className="block text-sm text-muted">
                 {field.label}
               </span>
               {field.hint && (
-                <p className="mt-1 text-xs text-neutral-500">{field.hint}</p>
+                <p className="mt-1 text-xs text-muted">{field.hint}</p>
               )}
               <div className="mt-2">
                 <ListStringField
@@ -74,11 +74,11 @@ export function SettingsGroupForm({
             : [];
           return (
             <div key={field.key}>
-              <span className="block text-sm text-neutral-600">
+              <span className="block text-sm text-muted">
                 {field.label}
               </span>
               {field.hint && (
-                <p className="mt-1 text-xs text-neutral-500">{field.hint}</p>
+                <p className="mt-1 text-xs text-muted">{field.hint}</p>
               )}
               <div className="mt-2">
                 <ListObjectField

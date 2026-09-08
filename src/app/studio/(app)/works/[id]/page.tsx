@@ -24,7 +24,7 @@ export default async function EditWorkPage({
 
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-10 lg:px-10 lg:py-14">
-      <h1 className="font-display text-3xl tracking-tight text-primary">
+      <h1 className="font-display text-3xl tracking-tight text-ink">
         Edit work
       </h1>
       <div className="mt-8">

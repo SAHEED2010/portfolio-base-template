@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { getSettings, settingString } from "@/lib/settings";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-script";
 
 // next/font/google downloads and self-hosts these at BUILD time — no
 // runtime request to Google, no layout shift. `variable` exposes each
@@ -53,10 +54,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Tints the browser chrome on mobile to match the page background,
-// so the app frame doesn't sit as a white band above a warm page.
+// Tints the browser chrome on mobile to match the page background —
+// two entries so it follows the OS setting, same as the CSS. This
+// only tracks prefers-color-scheme; an explicit in-page toggle choice
+// can't retarget a static <meta> tag, which is a real but minor gap
+// (the page content itself is never wrong — only this one browser-
+// chrome color can lag an explicit override until the OS agrees).
 export const viewport = {
-  themeColor: "#FAF9F7",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf9f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#17181a" },
+  ],
 };
 
 export default function RootLayout({
@@ -64,6 +72,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
+      <head>
+        {/* Flash-free even though Next places this after its own
+            generated <head> tags, not literally first — see
+            src/lib/theme-script.ts for the verified mechanism. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>
         <a
           href="#top"

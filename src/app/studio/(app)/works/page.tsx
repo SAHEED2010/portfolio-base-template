@@ -42,7 +42,7 @@ export default async function WorksPage() {
           {works.map((work, index) => (
             <li
               key={work.id}
-              className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-3"
+              className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3"
             >
               <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
                 {work.image_url ? (
@@ -67,12 +67,12 @@ export default async function WorksPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/studio/works/${work.id}`}
-                  className="link-underline text-base font-medium text-primary hover:text-accent"
+                  className="link-underline text-base font-medium text-ink hover:text-accent"
                 >
                   {work.title}
                 </Link>
                 {work.subtitle && (
-                  <p className="truncate text-sm text-neutral-500">
+                  <p className="truncate text-sm text-muted">
                     {work.subtitle}
                   </p>
                 )}

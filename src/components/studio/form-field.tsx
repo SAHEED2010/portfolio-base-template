@@ -12,7 +12,7 @@ import { useFormStatus } from "react-dom";
 // looking like one product.
 
 export const fieldClass =
-  "w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-base text-primary transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
 
 export function Field({
   id,
@@ -29,14 +29,14 @@ export function Field({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm text-neutral-600">
+      <label htmlFor={id} className="block text-sm text-muted">
         {label}
       </label>
       {children}
       {/* Hint gives way to the error rather than stacking, so the
           field never shows contradictory guidance. */}
       {hint && !errors?.length && (
-        <p className="mt-1.5 text-xs text-neutral-500">{hint}</p>
+        <p className="mt-1.5 text-xs text-muted">{hint}</p>
       )}
       {errors?.length ? (
         <p id={`${id}-error`} className="mt-1.5 text-sm text-red-700">
@@ -74,7 +74,7 @@ export function FormFooter({
       <SaveButton label={saveLabel} />
       <Link
         href={cancelHref}
-        className="tap inline-flex min-h-11 items-center rounded-full px-5 text-sm text-neutral-600 transition-colors hover:text-primary"
+        className="tap inline-flex min-h-11 items-center rounded-full px-5 text-sm text-muted transition-colors hover:text-ink"
       >
         Cancel
       </Link>

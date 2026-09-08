@@ -20,10 +20,78 @@
   --color-neutral-800: #2b2825;
   --color-neutral-900: #1a1917;
 
+  /* Theme-reactive surface tokens (dark mode). Light values here;
+     redefined under the dark selectors below. Designed as real dark
+     values with checked contrast ratios (DECISIONS.md) — not a
+     mechanical inversion of the light palette. */
+  --color-page: #faf9f7; /* page background */
+  --color-ink: #14181c; /* body text */
+  --color-muted: #7d766d; /* secondary text — labels, dates, captions */
+  --color-border: #e8e4df; /* hairlines: dividers AND component
+    boundaries (inputs, cards) — see DECISIONS.md on why one token
+    covers both after the studio border-contrast fix */
+  --color-surface: #ffffff; /* cards, studio form fields */
+  --color-accent-text: #2e6e68; /* accent used AS TEXT on the page
+    (links, tagline) — distinct from --color-accent, which is a
+    filled-button background and never needs a dark variant itself */
+
+  /* Fixed anchor tokens — the testimonials dark band. These do NOT
+     change between themes: the "one break in an otherwise uniform
+     page" (DECISIONS.md, §1.9) has to survive the page itself going
+     dark, or the break disappears. Values match what was already
+     hardcoded in testimonials.tsx before this token existed. */
+  --color-anchor: #14181c;
+  --color-anchor-fg: #faf9f7;
+  --color-anchor-muted: #a9a29a;
+  --color-anchor-accent: #3e8a83;
+
   --font-display: var(--font-fraunces);
   --font-body: var(--font-inter);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===============================================================
+   DARK MODE
+   Three states, same contract used for the artifact runtime and
+   documented here for the same reason: an explicit choice (data-theme
+   on <html>, set by theme-script.ts before first paint) always wins;
+   with no explicit choice, the OS setting decides via a plain media
+   query that updates live with zero JS.
+
+   - :root                                   → light (default values above)
+   - @media (prefers-color-scheme: dark)      → system dark, unless
+     :root:not([data-theme="light"])           explicitly set to light
+   - [data-theme="dark"]                      → explicit dark, always wins
+
+   Values are NOT an inversion of the light palette — each was picked
+   and contrast-checked on its own (DECISIONS.md). One deliberate
+   structural finding baked in here: every studio surface (list rows,
+   Overview tiles, form inputs) carries ZERO shadow and relies on
+   --color-border alone to separate a white-ish card from an
+   off-white-ish page — so --color-border is a STRUCTURAL boundary,
+   not a decorative one, and its dark value is picked to clear the
+   WCAG 1.4.11 3:1 floor against both --color-page and --color-surface
+   (checked: 3.47:1 and 3.19:1), not just to look like a subtle
+   divider the way the public site's plain row rhythm lines do. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-page: #17181a;
+    --color-ink: #edeae4;
+    --color-muted: #9a9488;
+    --color-border: #6b6e72;
+    --color-surface: #1e2023;
+    --color-accent-text: #4f9992;
+  }
+}
+
+[data-theme="dark"] {
+  --color-page: #17181a;
+  --color-ink: #edeae4;
+  --color-muted: #9a9488;
+  --color-border: #6b6e72;
+  --color-surface: #1e2023;
+  --color-accent-text: #4f9992;
 }
 
 :root {
@@ -37,14 +105,32 @@ html {
   scroll-behavior: smooth;
   /* Anchor links land below the sticky header instead of under it. */
   scroll-padding-top: 5rem;
+  /* Tells the browser which palette is active, so native form
+     controls, scrollbars, and the system UI chrome (the same
+     mechanism the <meta name="theme-color"> in layout.tsx targets)
+     adapt without extra CSS. */
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    color-scheme: dark;
+  }
 }
 
 body {
-  background: var(--color-neutral-50);
-  color: var(--color-primary);
+  background: var(--color-page);
+  color: var(--color-ink);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition:
+    background-color 200ms var(--ease-out-soft),
+    color 200ms var(--ease-out-soft);
 }
 
 /* Fraunces is variable — these axes are what let a fork shift the

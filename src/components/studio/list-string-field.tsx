@@ -55,7 +55,7 @@ export function ListStringField({
               }}
               disabled={i === 0}
               aria-label="Move up"
-              className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500 transition-colors hover:border-neutral-400 hover:text-primary disabled:cursor-not-allowed disabled:opacity-30"
+              className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:border-neutral-400 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
             >
               ↑
             </button>
@@ -69,7 +69,7 @@ export function ListStringField({
               }}
               disabled={i === items.length - 1}
               aria-label="Move down"
-              className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 text-neutral-500 transition-colors hover:border-neutral-400 hover:text-primary disabled:cursor-not-allowed disabled:opacity-30"
+              className="tap flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition-colors hover:border-neutral-400 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
             >
               ↓
             </button>
@@ -77,7 +77,7 @@ export function ListStringField({
               type="button"
               onClick={() => update(items.filter((_, idx) => idx !== i))}
               aria-label="Remove"
-              className="tap flex h-9 items-center rounded-lg px-3 text-sm text-neutral-500 transition-colors hover:text-red-700"
+              className="tap flex h-9 items-center rounded-lg px-3 text-sm text-muted transition-colors hover:text-red-700"
             >
               Remove
             </button>
@@ -92,7 +92,7 @@ export function ListStringField({
       <button
         type="button"
         onClick={() => update([...items, ""])}
-        className="tap mt-1 inline-flex min-h-11 w-fit items-center rounded-full border border-neutral-200 px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-primary"
+        className="tap mt-1 inline-flex min-h-11 w-fit items-center rounded-full border border-border px-5 text-sm text-neutral-700 transition-colors hover:border-neutral-400 hover:text-ink"
       >
         {itemLabel}
       </button>

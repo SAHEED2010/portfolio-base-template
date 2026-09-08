@@ -41,7 +41,7 @@ export default async function SkillsPage() {
           {skills.map((skill, index) => (
             <li
               key={skill.id}
-              className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white p-3"
+              className="flex items-center gap-4 rounded-xl border border-border bg-surface p-3"
             >
               <span className="w-8 shrink-0 pl-1 text-xs tabular-nums text-neutral-400">
                 {String(index + 1).padStart(2, "0")}
@@ -49,7 +49,7 @@ export default async function SkillsPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/studio/skills/${skill.id}`}
-                  className="link-underline text-base font-medium text-primary hover:text-accent"
+                  className="link-underline text-base font-medium text-ink hover:text-accent"
                 >
                   {skill.name}
                 </Link>

@@ -32,11 +32,11 @@ export function About({
           {stats.map((stat, i) => (
             <Reveal key={stat.id} delay={i * 80}>
               {/* Hairline dividers only once the stats sit in one row. */}
-              <div className="lg:border-l lg:border-neutral-200 lg:pl-6">
-                <p className="font-display text-4xl tracking-tight text-primary lg:text-5xl">
+              <div className="lg:border-l lg:border-border lg:pl-6">
+                <p className="font-display text-4xl tracking-tight text-ink lg:text-5xl">
                   {stat.number}
                 </p>
-                <p className="mt-2 text-sm uppercase tracking-[0.12em] text-neutral-500">
+                <p className="mt-2 text-sm uppercase tracking-[0.12em] text-muted">
                   {stat.label}
                 </p>
               </div>
