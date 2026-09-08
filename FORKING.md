@@ -73,7 +73,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service role> \
   node scripts/studio-smoke-test.mjs   # expect 5/5
 ```
 
-Do not continue on anything less than 10/10 and 5/5.
+Do not continue on anything less than 10/10, 5/5 and 5/5.
 
 ## 4. Seed starting content
 
@@ -97,9 +97,15 @@ reachable.
 
 Three things must all be off. Missing any one leaves the hole open:
 
-- [ ] **`supabase/config.toml`** — `enable_signup = false` under both
-      `[auth]` and `[auth.email]`. Already set in the base; verify it
-      survived your fork.
+- [ ] **`supabase/config.toml`** — `enable_signup = false` under
+      **`[auth]` only**. Already set in the base; verify it survived
+      your fork.
+
+      ⚠️ **Leave `[auth.email] enable_signup = true`.** Despite the
+      name it maps to GoTrue's `EXTERNAL_EMAIL_ENABLED`, so setting it
+      false disables email **login** outright and locks both users out
+      with "Email logins are disabled". The `[auth]` flag alone blocks
+      signup — verified.
 - [ ] **Hosted project** → Authentication → Sign In / Providers →
       **Email** → *Allow new users to sign up* **off**. This is a
       **separate setting from config.toml**, which only governs the
@@ -219,7 +225,7 @@ When you're in a fork for other reasons:
 
 1. Read `CHANGES.md` in the base, from the commit in `.forked-from`
 2. Port only what matters to this client
-3. Re-run both smoke tests if anything touched schema or RLS
+3. Re-run all three smoke tests if anything touched schema, RLS or a studio form
 4. Update `.forked-from`
 
 Resist porting everything. A fork that tracks the base perfectly is a
