@@ -68,6 +68,9 @@ SUPABASE_SERVICE_ROLE_KEY=<service role> \
 
 # same env vars
   node scripts/storage-smoke-test.mjs  # expect 5/5
+
+# and, with the app running (APP_URL defaults to 127.0.0.1:3000)
+  node scripts/studio-smoke-test.mjs   # expect 5/5
 ```
 
 Do not continue on anything less than 10/10 and 5/5.

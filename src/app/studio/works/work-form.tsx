@@ -86,10 +86,17 @@ export function WorkForm({
 
   return (
     <form
-      action={(formData) => {
-        setDirty(false);
-        return formAction(formData);
-      }}
+      // formAction MUST be passed directly. Wrapping it in an arrow
+      // function turns the form into a CLIENT action: React then
+      // renders action="javascript:throw new Error('React form
+      // unexpectedly submitted.')" instead of the real server-action
+      // wiring, and the submit never reaches the server. That was the
+      // loop-2 bug — updateWork was never invoked once.
+      //
+      // Resetting `dirty` happens in onSubmit, which fires before the
+      // action runs and does not disturb the wiring.
+      action={formAction}
+      onSubmit={() => setDirty(false)}
       onChange={() => setDirty(true)}
       className="flex max-w-2xl flex-col gap-6"
       noValidate
