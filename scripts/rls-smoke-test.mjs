@@ -168,7 +168,45 @@ for (const table of PUBLIC_READ_TABLES) {
   );
 }
 
-// 9. anon must NOT be able to write to a public-read table.
+// 9. anon must NOT be able to delete inbox rows.
+//
+// Careful: PostgREST returns 204 here, NOT a 4xx. RLS filters the
+// target rows down to zero, so the DELETE "succeeds" against nothing.
+// Asserting on the status code would wrongly conclude anon can
+// delete — the only meaningful assertion is that the row survives.
+{
+  const before = await req(
+    "GET",
+    `contact_messages?select=id&name=eq.${encodeURIComponent(SEEDS.contact_messages.name)}`,
+    { key: SERVICE_KEY },
+  );
+  await req(
+    "DELETE",
+    `contact_messages?name=eq.${encodeURIComponent(SEEDS.contact_messages.name)}`,
+    { key: ANON_KEY },
+  );
+  const after = await req(
+    "GET",
+    `contact_messages?select=id&name=eq.${encodeURIComponent(SEEDS.contact_messages.name)}`,
+    { key: SERVICE_KEY },
+  );
+
+  const survived =
+    Array.isArray(before.body) &&
+    Array.isArray(after.body) &&
+    before.body.length > 0 &&
+    before.body.length === after.body.length;
+
+  assert(
+    "anon DELETE on contact_messages removes nothing",
+    survived,
+    `rows before ${Array.isArray(before.body) ? before.body.length : "?"}, ` +
+      `after ${Array.isArray(after.body) ? after.body.length : "?"}` +
+      (survived ? " — row survived" : " — ROW WAS DELETED"),
+  );
+}
+
+// 10. anon must NOT be able to write to a public-read table.
 {
   const r = await req("POST", "works", {
     key: ANON_KEY,

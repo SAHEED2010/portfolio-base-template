@@ -64,13 +64,13 @@ misconfiguration here exposes the client's inbox:
 SUPABASE_URL=<project url> \
 SUPABASE_ANON_KEY=<anon> \
 SUPABASE_SERVICE_ROLE_KEY=<service role> \
-  node scripts/rls-smoke-test.mjs      # expect 9/9
+  node scripts/rls-smoke-test.mjs      # expect 10/10
 
 # same env vars
   node scripts/storage-smoke-test.mjs  # expect 5/5
 ```
 
-Do not continue on anything less than 9/9 and 5/5.
+Do not continue on anything less than 10/10 and 5/5.
 
 ## 4. Seed starting content
 
@@ -84,18 +84,70 @@ studio. Editing the file first is usually faster for the initial load.
 
 Do not ship a client site with "Mara Ellison" anywhere in it.
 
-## 5. Create the two users
+## 5. Lock down signup — do this BEFORE creating users
 
-In the Supabase dashboard → Authentication → Users → **Add user**,
-create exactly two, both with "Auto Confirm User" on:
+**This is a security step, not a preference.** Write RLS policies
+grant to the `authenticated` role, so *anyone* who can self-register
+gets write access to all six content tables. `/studio` being an
+unusual path is irrelevant — the auth API is public and always
+reachable.
+
+Three things must all be off. Missing any one leaves the hole open:
+
+- [ ] **`supabase/config.toml`** — `enable_signup = false` under both
+      `[auth]` and `[auth.email]`. Already set in the base; verify it
+      survived your fork.
+- [ ] **Hosted project** → Authentication → Sign In / Providers →
+      **Email** → *Allow new users to sign up* **off**. This is a
+      **separate setting from config.toml**, which only governs the
+      local stack. Turning one off does not turn off the other.
+- [ ] **Hosted project** → Authentication → Sign In / Providers →
+      confirm **no OAuth provider is enabled** (Google, GitHub,
+      Apple…). Email signup being off does not close a provider that
+      is on — a live provider is a self-serve signup route straight
+      past it.
+
+Verify by attempting a signup against the hosted project. It must be
+rejected:
+
+```bash
+curl -X POST '<project url>/auth/v1/signup' \
+  -H "apikey: <anon key>" -H 'Content-Type: application/json' \
+  -d '{"email":"probe@example.com","password":"probe-password-123"}'
+```
+
+A created user or a session in the response means the hole is still
+open. Do not continue.
+
+## 6. Create the two users
+
+Supabase dashboard → Authentication → Users → **Add user** → *Create
+new user*. Exactly two, both with **Auto Confirm User** on (there is
+no confirmation email flow in V1):
 
 1. **The client** — their real email
 2. **Support** — yours
 
-There is no self-serve password reset in V1. Resets are manual, from
-this dashboard.
+### How the client gets their password
 
-## 6. Theme the site
+There is **no self-serve reset**, so this cannot be left to the
+client to figure out:
+
+1. You set a password when creating the user — use a generated one,
+   not a memorable one.
+2. Send it to the client over something that isn't email-in-plaintext
+   — a password manager share link, or read it to them.
+3. Tell them plainly: **there is no "forgot password" link.** If they
+   lose it, they contact you and you reset it from the dashboard
+   (Authentication → Users → ⋯ → Reset password).
+4. Have them sign in once while you're on the call. An account nobody
+   has ever logged into is an account that fails the week you're
+   unreachable.
+
+The support account exists precisely so a locked-out client is a
+phone call, not an outage.
+
+## 7. Theme the site
 
 `src/theme.ts` and the `@theme` block in `src/app/globals.css` are the
 restyle surface. Change both together — they mirror each other.
@@ -116,7 +168,7 @@ No code change needed. In `site_settings`, edit the `label_*` keys —
 "Work" → "Cases", "Publications", "Productions". The nav, headings and
 anchors all follow.
 
-## 7. Replace the base's placeholder identity
+## 8. Replace the base's placeholder identity
 
 Easy to forget, visible if you do:
 
@@ -125,7 +177,7 @@ Easy to forget, visible if you do:
 - [ ] `site_title`, `seo_description` in `site_settings`
 - [ ] `hero_portrait_url` — until set, the hero shows an initials placeholder
 
-## 8. Deploy to Vercel
+## 9. Deploy to Vercel
 
 Import the client repo. Set two environment variables:
 
@@ -146,7 +198,7 @@ a quiet portfolio 500 on the first visit after a lull. Add a weekly
 Vercel cron that pings the DB (`DECISIONS.md`, Accounts and
 ownership).
 
-## 9. Hand over
+## 10. Hand over
 
 - [ ] Client can sign in at `/studio`
 - [ ] Client has edited one thing successfully while you watch

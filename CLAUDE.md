@@ -125,6 +125,12 @@ Short, bullet form:
 - Before writing schema migrations, show them for review — highest-
   leverage thing to get right
 - When you finish a build step, stop and show me before moving on
+- **You do not run `pnpm add`. Propose the dependency and stop — I
+  install it.** `pnpm add` stalls indefinitely from your shell and has
+  blocked work twice; the same command from my terminal finishes in
+  seconds. When a loop needs a new package, say which and why, then
+  wait. Running `pnpm install` (no `add`) to sync an existing lockfile
+  is fine.
 
 ---
 
