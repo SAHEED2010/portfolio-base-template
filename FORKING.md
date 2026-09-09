@@ -231,10 +231,21 @@ domain; you configure DNS).
 
 ### Keep the database warm
 
-The Supabase free tier pauses a project after inactivity, which makes
-a quiet portfolio 500 on the first visit after a lull. Add a weekly
-Vercel cron that pings the DB (`DECISIONS.md`, Accounts and
-ownership).
+The Supabase free tier pauses a project after ~7 days of inactivity,
+which makes a quiet portfolio 500 on the first visit after a lull.
+**Already in the base** — `/api/cron/keep-warm` + `vercel.json` ping
+the DB once daily (the maximum Vercel's Hobby plan allows for cron
+jobs at all, which still leaves a ~6-day safety margin). Nothing to
+add here; just verify:
+
+- [ ] `CRON_SECRET` is set in the Vercel project's environment
+      variables (Settings → Environment Variables) — a random string,
+      16+ characters. **Vercel does not generate this for you**;
+      you set it. Without it, the cron route 401s every invocation
+      and the pause risk is back.
+- [ ] After the first deploy, Settings → Cron Jobs shows
+      `/api/cron/keep-warm` scheduled and its first run succeeded
+      (200, not 401 or 500).
 
 ## 10. Replace every seeded default — REQUIRED before launch
 

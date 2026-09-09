@@ -230,8 +230,19 @@ the reasoning.
   a liability; invites are revocable. Vercel under me because I'm the
   one deploying.
 - **2026-09-07 — Free tier accepted, with known cost**: Supabase free
-  tier pauses after inactivity. Mitigation: a weekly Vercel cron pings
-  the DB to keep it warm.
+  tier pauses after inactivity. Mitigation: a Vercel cron pings the DB
+  to keep it warm.
+- **2026-09-09 — Shipped, not aspirational**: `/api/cron/keep-warm` +
+  `vercel.json`, once daily. Found at the freeze that the mitigation
+  above had been committed to but never built — `FORKING.md` told
+  forks to "add" a cron with nothing to point at. Daily isn't a
+  conservative choice, it's Vercel Hobby's actual ceiling for cron
+  frequency (confirmed against Vercel's docs before building — free
+  tier is capped at once per day, ±59 min timing precision), leaving
+  a ~6-day margin against Supabase's ~7-day pause window. Guarded by
+  `CRON_SECRET` (Vercel's documented pattern — set manually per
+  project, not auto-generated). Building once in the base means every
+  fork inherits it instead of debugging the instruction.
 - **2026-09-09 — Base ships the stock Next.js favicon on purpose, not
   a neutral custom one**: `check-seed-drift.mjs` can only flag
   *content* (a row, a `site_settings` value) — it has no way to check
