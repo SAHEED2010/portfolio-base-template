@@ -1,0 +1,54 @@
+name: CI
+
+# Deliberately minimal: typecheck, lint, build. No test suite here.
+#
+# The four smoke-test suites (rls, storage, studio, seed-drift) need
+# a live Supabase project with real seed data — that means either
+# credentials in CI secrets or spinning up a fresh instance per run,
+# and neither is worth it for a template repo with no live project of
+# its own. They stay local scripts, run by hand against a fork before
+# it goes live (FORKING.md).
+#
+# The job this workflow actually does: a fork edited six months from
+# now, by someone who isn't the person who built the base, still gets
+# told when it stops compiling.
+#
+# No Supabase credentials needed even for the build step — verified,
+# not assumed: src/lib/db.ts degrades gracefully with a console.warn
+# and empty results when NEXT_PUBLIC_SUPABASE_URL/_ANON_KEY are unset,
+# so `next build` succeeds without them. Confirmed by running the
+# build with both vars empty before writing this workflow.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Pinned to the exact version in package.json's packageManager
+      # field, not a floating major — a CI pnpm that resolves
+      # dependencies differently than a contributor's local install is
+      # exactly the kind of drift this workflow exists to catch.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build

@@ -181,10 +181,10 @@ anchors all follow.
 
 ## 8. Replace the base's placeholder identity
 
-Easy to forget, visible if you do:
+Easy to forget, visible if you do. The favicon and OG image
+specifically move to step 10's checklist, not this one — see the note
+there for why.
 
-- [ ] `src/app/favicon.ico` — **still the stock Next.js icon.** Replace it.
-- [ ] Open Graph image — the base ships none. Add `src/app/opengraph-image.png` (1200×630). These sites get shared into WhatsApp and Instagram, where the preview card is the first impression.
 - [ ] `site_title`, `seo_description` in `site_settings`
 - [ ] `hero_portrait_url` — until set, the hero shows an initials placeholder
 
@@ -236,6 +236,25 @@ tables against `scripts/seed-manifest.json` (generated from
 - [ ] If `seed.sql` was hand-edited for this fork instead of replaced
       through the studio, regenerate the manifest first:
       `node scripts/generate-seed-manifest.mjs`
+
+**Two more defaults belong on this list, for the opposite reason
+they're on it at all:** the seed-drift check above can only flag
+*content* — a row in a table, a `site_settings` value. The favicon
+and the Open Graph image are files, not rows, so nothing automated
+will ever catch a fork that forgets them. The base deliberately ships
+the stock Next.js favicon rather than a neutral custom one — a
+neutral placeholder is just a *different* thing to forget to replace,
+and unlike seeded content it would never get flagged by anything.
+Shipping the obviously-wrong default is the more honest failure mode:
+if you see the Next.js icon in a client's browser tab, you know
+immediately it wasn't replaced.
+
+- [ ] `src/app/favicon.ico` — **still the stock Next.js icon**, on
+      purpose (see above). Replace it.
+- [ ] Open Graph image — the base ships none. Add
+      `src/app/opengraph-image.png` (1200×630). These sites get
+      shared into WhatsApp and Instagram DMs, where the preview card
+      is the first impression.
 
 Do not hand over to the client while this check reports anything.
 

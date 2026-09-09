@@ -232,13 +232,30 @@ the reasoning.
 - **2026-09-07 — Free tier accepted, with known cost**: Supabase free
   tier pauses after inactivity. Mitigation: a weekly Vercel cron pings
   the DB to keep it warm.
+- **2026-09-09 — Base ships the stock Next.js favicon on purpose, not
+  a neutral custom one**: `check-seed-drift.mjs` can only flag
+  *content* (a row, a `site_settings` value) — it has no way to check
+  a binary file, so nothing automated ever catches a forgotten
+  favicon or OG image. A neutral placeholder would just be a
+  different thing to forget; the obviously-wrong stock icon is the
+  more honest failure mode; if it's still there in a client's browser
+  tab, that's an unmistakable signal. `FORKING.md` §10.
 
-  ## CI and code review
+## CI and code review
 
-- **2026-09-07 — CI on push in Phase 1**: GitHub Actions runs
-  `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` on every
-  push and PR. Catches the case where local loop passed but a clean
-  environment fails. Free, low-config, high-signal.
+- **2026-09-07 — CI planned for Phase 1** *(superseded below — this
+  entry named `pnpm test`, which the actual build never added)*.
+- **2026-09-09 — CI is typecheck + lint + build only, no test suite**:
+  the four smoke-test suites need a live Supabase project with real
+  seed data — credentials in CI secrets or a spun-up instance per run,
+  neither worth it for a template repo with no live project of its
+  own. They stay local scripts, run by hand against a fork before it
+  goes live (`FORKING.md` §3). CI's actual job: a fork edited months
+  from now, by someone who isn't either of us, still gets told when it
+  stops compiling. Needs zero Supabase credentials even for the build
+  step — verified by running `pnpm build` with both env vars empty
+  before writing the workflow: `src/lib/db.ts` degrades to a
+  `console.warn` and empty results rather than throwing.
 - **2026-09-07 — No AI review bot in V1**: Claude Code's build-test-
   review loop already runs tests and type-check before handing over
   code. Adding CodeRabbit or similar on a solo repo produces mostly
