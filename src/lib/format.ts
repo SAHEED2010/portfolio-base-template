@@ -18,6 +18,18 @@ export function formatDateRange(start: string, end: string | null): string {
   return `${formatMonthYear(start)} — ${end ? formatMonthYear(end) : "Present"}`;
 }
 
+// created_at is a real timestamptz (unlike the date-only columns
+// above), so the UTC-pinning concern doesn't apply — formatting it in
+// the viewer's own local time zone is exactly what an inbox needs.
+const dateTime = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
+
+export function formatDateTime(isoTimestamp: string): string {
+  return dateTime.format(new Date(isoTimestamp));
+}
+
 export function initialsFrom(name: string): string {
   return name
     .split(/\s+/)

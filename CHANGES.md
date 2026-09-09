@@ -12,6 +12,45 @@ to care**.
 
 ---
 
+## 2026-09-09 — Studio: Inbox (loop 4 — the studio is now feature-complete)
+
+### Added
+
+- `/studio/inbox` — list, mark read/unread, delete, `mailto:` reply.
+  No create or edit route: messages arrive only through the public
+  contact form (anon INSERT, already proven by `rls-smoke-test.mjs`);
+  the studio's only jobs on this table are read state and deletion.
+  Sorted newest-first by `created_at` — this table has no
+  `display_order` and shouldn't get one, it's inbound mail, not a
+  curated list.
+- `formatDateTime` in `lib/format.ts`, formatted in the viewer's own
+  time zone — `created_at` is a real timestamptz, unlike the
+  date-only columns the existing UTC-pinned helpers exist for.
+
+### Verified, not assumed
+
+- Re-ran `rls-smoke-test.mjs` before starting this loop specifically
+  to confirm the anon-DELETE-removes-nothing assertion still held
+  after a Docker/Supabase restart mid-session — 10/10.
+- End-to-end check seeds a row through the REAL anon INSERT path (not
+  a service-role shortcut), then drives mark-read, mark-unread, and
+  delete through the actual rendered form's action encoding — 13/13.
+  Building that check reproduced the `Prefer: return=representation`
+  401 gotcha (documented in `contact-form`'s server action) in the
+  test script itself before it was fixed there — the same mistake is
+  easy to make twice.
+- The unread-row styling (`border-accent/25 bg-accent/5`) is the
+  identical class string already used by Overview's unread-count
+  callout, which had already gone through the accepted dark/light
+  browser pass — confirmed via string match rather than re-deriving
+  the contrast case.
+
+This closes loop 4. The studio now covers all seven content tables
+plus the inbox: auth, works, experiences, skills, testimonials,
+stats, site_settings, and now contact_messages.
+
+---
+
 ## 2026-09-09 — Studio: Site content, and the seed-drift check
 
 ### Added
