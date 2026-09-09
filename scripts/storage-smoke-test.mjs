@@ -39,7 +39,11 @@ async function upload(path, body, { key, contentType }) {
   const res = await fetch(`${URL_BASE}/storage/v1/object/${BUCKET}/${path}`, {
     method: "POST",
     headers: {
-      apikey: ANON_KEY,
+      // apikey matches the active key, same pattern as
+      // rls-smoke-test.mjs's req() — not just cosmetic consistency:
+      // it's the role that's actually under test in each call
+      // (anon/user/service), not a blanket project identifier.
+      apikey: key,
       Authorization: `Bearer ${key}`,
       "Content-Type": contentType,
     },

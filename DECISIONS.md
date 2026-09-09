@@ -124,6 +124,15 @@ the reasoning.
   Vertical order states it plainly — message first, write second. The
   split only ever did work on desktop; at 375px it collapsed to this
   same stack.
+- **2026-09-10 — Cut from V1: email notifications on new contact
+  messages (Resend)**: committed in the original stack plan, never
+  built. Found at the ultra-review (pre-push) that nobody had formally
+  closed the loop on it the way booking/payments/i18n/blog were.
+  Deferred to V1.1 because Resend requires per-fork domain
+  verification that `FORKING.md` doesn't currently document — adding
+  the dependency without that documentation would leave every fork
+  operator to work out sender-domain setup alone. Clients check
+  `/studio/inbox` for new messages in V1.
 
 ## Auth
 
@@ -243,6 +252,18 @@ the reasoning.
   `CRON_SECRET` (Vercel's documented pattern — set manually per
   project, not auto-generated). Building once in the base means every
   fork inherits it instead of debugging the instruction.
+- **2026-09-10 — Cron route uses the anon key, not service role**:
+  the first version used service role, reasoning that a cron trigger
+  has no user session to authorize against. Found at the ultra-review
+  (pre-push) that this contradicts `FORKING.md`'s explicit "never add
+  the service role key to Vercel" — a fork following that instruction
+  literally would have shipped a cron that 500s on every real
+  invocation, only appearing to work in local dev where a developer's
+  own `.env.local` happened to hold that key for other reasons.
+  Unnecessary anyway: `site_settings` has public SELECT RLS, so the
+  anon key reads it exactly as well. Re-verified locally after the
+  fix: 200 with the anon key doing the read, 401 on a wrong or
+  missing `CRON_SECRET`, same as before.
 - **2026-09-09 — Base ships the stock Next.js favicon on purpose, not
   a neutral custom one**: `check-seed-drift.mjs` can only flag
   *content* (a row, a `site_settings` value) — it has no way to check

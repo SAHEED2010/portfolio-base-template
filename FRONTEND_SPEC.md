@@ -45,6 +45,14 @@ as Tailwind v4 `@theme` tokens. A fork restyles by editing those two.
 against `primary` (`#14181C`). Inside the testimonials band, any accent
 text or mark uses `accent-light` (`#3E8A83`).
 
+**This table is the light-mode / always-fixed layer.** Six of these
+roles (background, body text, muted text, borders, surfaces, accent-
+as-text) also have theme-reactive dark variants, and the testimonials
+band's four (`primary`, `neutral-50`, `neutral-400`, `accent-light` as
+used there) are fixed on purpose rather than swapped — see **§1.13
+Dark mode** for both the reactive token set and why the anchor band
+doesn't move.
+
 ## 1.2 Fonts
 
 - **Fraunces** (`--font-display`, class `.font-display`) — variable
@@ -148,7 +156,12 @@ Rules:
 - Children stagger via `Reveal`'s `delay` prop, in reading order.
 - **No scroll-snap between sections** — it fights natural reading on
   a long page. Scroll-snap is used *within* the testimonials track only.
-- **No parallax. No autoplay carousels.**
+- **No parallax.** Autoplaying motion (marquee, carousel drift) is
+  allowed only where it can be paused by hover, focus, and an explicit
+  touch control — and where `prefers-reduced-motion` collapses it to
+  static or hands the track back to normal scroll. This is what the
+  testimonials marquee actually does (§2.5); it is the standard for
+  any future autoplaying element, not an exception to a blanket ban.
 - Every animation is decorative, so all of it is disabled by the
   global `prefers-reduced-motion` rule in `globals.css`.
 
@@ -235,6 +248,72 @@ minute without hitting the DB per render.
   `aria-hidden`; placeholders carry `sr-only` text where meaningful.
 - Anchor targets clear the sticky header via `scroll-padding-top: 5rem`.
 
+## 1.13 Dark mode
+
+Three states — **system** (default), explicit **light**, explicit
+**dark** — on both the public site and the studio. Colours stay
+non-editable (`DECISIONS.md` unchanged elsewhere): this is a second
+CSS token set switched by `data-theme`, never exposed through
+`site_settings` or the field map.
+
+**Mechanism.** No attribute on `<html>` means system: a plain
+`@media (prefers-color-scheme: dark)` query tracks the OS live, with
+zero JS. An explicit choice sets `data-theme="dark"` or
+`data-theme="light"`, which always wins over the OS regardless. The
+choice is resolved by an inline, synchronous script
+(`src/lib/theme-script.ts`) that runs before first paint and sets the
+attribute via a plain DOM call — never through React, so the
+server-rendered `<html>` (which carries no `data-theme` prop at all)
+never disagrees with the client and no hydration-mismatch warning is
+possible. One `localStorage` key ("theme") covers both the public
+site and the studio: the whole app renders exactly one `<html>`
+(`src/app/studio/layout.tsx` returns a bare fragment, not its own
+`<html>`), so there's one origin and one store regardless of which
+page a visitor hits first. `ThemeToggle` (`src/components/
+theme-toggle.tsx`) is three real buttons — System / Light / Dark —
+each with `aria-pressed`, not an icon that silently swaps meaning.
+
+**Token architecture.** Six tokens are theme-reactive, redefined
+under both the media query and `[data-theme="dark"]`:
+
+| token | light | dark | role |
+|---|---|---|---|
+| `--color-page` | `#FAF9F7` | `#17181A` | page background |
+| `--color-ink` | `#14181C` | `#EDEAE4` | body text |
+| `--color-muted` | `#7D766D` | `#9A9488` | secondary text — labels, dates, captions |
+| `--color-border` | `#E8E4DF` | `#6B6E72` | hairlines: dividers AND component boundaries |
+| `--color-surface` | `#FFFFFF` | `#1E2023` | cards, studio form fields |
+| `--color-accent-text` | `#2E6E68` | `#4F9992` | accent used AS TEXT on the page (links, tagline) |
+
+Values are designed and contrast-checked on their own — not a
+mechanical inversion of the light palette. `--color-border`'s dark
+value in particular was raised from an initial `#34373B` (1.5:1,
+calibrated for decorative dividers) to `#6B6E72` (3.19–3.47:1) after
+checking that every studio surface (list rows, Overview tiles, form
+inputs) carries **zero shadow** and relies on the border alone to
+separate a card from the page — a structural boundary (WCAG 1.4.11),
+not a decorative one. `--color-accent-text` exists because plain
+`--color-accent` fails at 3.0:1 for text-sized use against the dark
+page background — the same problem already solved once for the
+testimonials band below, requiring its own fix here too.
+
+**Anchor decoupling.** Four tokens stay **fixed** across both
+themes — the testimonials dark band (§1.9) does not change when the
+rest of the page does, or "one break in an otherwise uniform page"
+loses its meaning the moment the whole page is already dark:
+
+| token | value (both themes) | mirrors |
+|---|---|---|
+| `--color-anchor` | `#14181C` | the band's background |
+| `--color-anchor-fg` | `#FAF9F7` | quote text |
+| `--color-anchor-muted` | `#A9A29A` | name / meta |
+| `--color-anchor-accent` | `#3E8A83` | rating dots, rule |
+
+**Verified, not assumed, at build time:** the homepage's static
+prerendering survives dark mode intact (`○ Static` in the build
+output) — theme resolution is entirely client-side, nothing touches a
+cookie or header at request time.
+
 ---
 
 # Part 2 — Section specs
@@ -309,7 +388,7 @@ Each row: zero-padded index (`01`, `02`, …, derived from position, not
 stored) + `name`.
 
 **Typography** — Index Inter `text-xs text-neutral-400`, tabular
-figures. Name Inter `text-lg lg:text-xl font-medium text-primary`.
+figures. Name Inter `text-lg lg:text-xl font-medium text-ink`.
 
 **Spacing** — Rows `py-5`, separated by `border-b border-neutral-200`
 hairlines. Column gap `lg:gap-x-16`.
@@ -568,6 +647,11 @@ action instead of none.
   smoke test.
 - **No captcha in V1.** `ip_address` is stored hashed for future spam
   mitigation (SCHEMA.md).
+- **No email notification on a new message.** The client checks
+  `/studio/inbox` (Overview also surfaces an unread count). Resend was
+  planned in the original stack but cut from V1 — deferred to V1.1
+  because it needs per-fork domain verification `FORKING.md` doesn't
+  yet document (`DECISIONS.md`, V1 scope).
 
 **States**
 
@@ -626,7 +710,7 @@ Not one of the six, but without it the page stops rather than ends.
 | Copyright | `© {current year} {site_title}` |
 
 **Typography** — All Inter `text-sm text-neutral-500`, except the
-title in Fraunces `text-base text-primary`.
+title in Fraunces `text-base text-ink`.
 
 **Motion** — None. The footer is not a moment.
 

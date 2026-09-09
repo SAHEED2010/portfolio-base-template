@@ -47,11 +47,13 @@ pnpm exec supabase start
 ```
 
 `supabase start` prints an API URL, an anon key and a service role
-key. Put the first two in `.env.local`:
+key. Copy `.env.local.example` to `.env.local` and fill in the first
+two:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from supabase start>
+cp .env.local.example .env.local
+# NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key from supabase start>
 ```
 
 Then:
@@ -95,20 +97,36 @@ pnpm exec supabase migration up   # apply pending migrations only
 `supabase/seed.sql` holds placeholder content so the site renders as a
 real portfolio on first run. A fork replaces it.
 
-### Smoke tests
+### Verification suites
 
-These prove the RLS policies actually work, rather than merely
-existing. Run them after any schema change:
+Four scripts, each proving something actually works rather than
+merely existing or merely rendering. Run all four after any schema,
+RLS, storage, or studio-form change — and always before a fork
+launches (`FORKING.md`):
 
 ```bash
 SUPABASE_URL=http://127.0.0.1:54321 \
 SUPABASE_ANON_KEY=<anon> \
 SUPABASE_SERVICE_ROLE_KEY=<service_role> \
-  node scripts/rls-smoke-test.mjs      # 9 assertions
+  node scripts/rls-smoke-test.mjs      # 10 assertions
 
 # same env vars
   node scripts/storage-smoke-test.mjs  # 5 assertions
+
+# same env vars, and with the app running (APP_URL defaults to
+# 127.0.0.1:3000) — provisions and cleans up its own throwaway user
+  node scripts/studio-smoke-test.mjs   # 16 assertions
+
+# only needs SUPABASE_URL and SUPABASE_ANON_KEY — read-only, flags
+# any row or setting still holding its seeded value
+SUPABASE_URL=http://127.0.0.1:54321 \
+SUPABASE_ANON_KEY=<anon> \
+  node scripts/check-seed-drift.mjs
 ```
+
+All four are self-cleaning: rows, storage objects and throwaway auth
+users they create are removed at the end of the run, even against a
+real project's data.
 
 ## Local development gotchas
 

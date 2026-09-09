@@ -8,12 +8,20 @@ import { NextRequest, NextResponse } from "next/server";
 // choice, it's the ceiling. That still leaves a ~6-day safety margin
 // against Supabase's pause window.
 //
-// This is the one route in the app that talks to Supabase with the
-// SERVICE ROLE key — legitimate here specifically because it has no
-// user context to authorize against (a cron trigger isn't a visitor
-// or a studio session) and RLS would otherwise block an unauthenticated
-// read of a table that requires it. Every other route in this app
-// uses the anon key; see lib/db.ts and lib/supabase/server.ts.
+// Uses the ANON key, like every other route in this app — NOT the
+// service role key. Do not "upgrade" this to service role: the first
+// version of this route did exactly that, reasoning that a cron
+// trigger has no user session to authorize against. That reasoning
+// was wrong in a way that only shows up at deploy time — FORKING.md
+// explicitly tells forks to never put the service role key in
+// Vercel, so a route that REQUIRES it there would 500 on every
+// invocation in production while appearing to work in local dev
+// (where a developer's own .env.local can hold that key for other
+// reasons). It doesn't need to be service role anyway: site_settings
+// has a public SELECT RLS policy, so the anon key reads it exactly as
+// well. If a future change to this route ever needs to read a table
+// that ISN'T public-read, that's a sign the route should pick a
+// different table, not reach for service role.
 //
 // Auth: Vercel's documented CRON_SECRET pattern. When that env var is
 // set on the Vercel project, Vercel automatically attaches it as
@@ -31,9 +39,9 @@ export async function GET(request: NextRequest) {
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !serviceKey) {
+  if (!url || !anonKey) {
     console.error("[cron/keep-warm] missing Supabase env vars");
     return NextResponse.json({ ok: false }, { status: 500 });
   }
@@ -43,8 +51,8 @@ export async function GET(request: NextRequest) {
   // data itself.
   const res = await fetch(`${url}/rest/v1/site_settings?select=key&limit=1`, {
     headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
+      apikey: anonKey,
+      Authorization: `Bearer ${anonKey}`,
     },
     cache: "no-store",
   });

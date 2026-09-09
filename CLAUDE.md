@@ -169,9 +169,12 @@ have the shape without leaving this file.
 - Deployed on Vercel
 - Server actions for all writes; no separate API layer
 - `browser-image-compression` for client-side image compression
-- Resend for transactional email
 - pnpm as package manager
 - `src/` directory layout, `@/*` import alias, ESLint + Prettier
+
+**Deferred to V1.1**: Resend for transactional email (contact-message
+notifications). Committed to in the original stack plan, never built
+in V1 — see "Cut from V1" below for why.
 
 ### Product shape
 
@@ -208,10 +211,14 @@ don't add silently.
 ### Cut from V1 (do not build, do not stub)
 
 Booking, payments, i18n, blog, promo modal, project/portfolio detail
-pages, self-serve password reset.
+pages, self-serve password reset, email notifications on new contact
+messages (Resend).
 
 Each work card links to an external URL. Password reset is manual via
-the Supabase dashboard.
+the Supabase dashboard. New contact messages: the client checks
+`/studio/inbox` — Resend was committed to in the original stack plan
+but never built; deferred to V1.1 because it needs per-fork domain
+verification that `FORKING.md` doesn't currently document.
 
 ### Auth
 
@@ -249,12 +256,16 @@ this one file.
 - `CONTEXT.md` — shared vocabulary (base, fork, section label, work
   item, site settings, studio) so sessions don't drift
 - `SCHEMA.md` — all seven tables, columns, types, RLS, one place
+- `FRONTEND_SPEC.md` — what the public page looks like and why
 - `CHANGES.md` — dated log of base changes, for porting into forks
 - `DECISIONS.md` — settled decisions, grouped by topic, dated
 
-
-- GitHub Actions CI: `pnpm test`, `pnpm typecheck`, `pnpm lint`,
-  `pnpm build` on every push and PR
+- GitHub Actions CI: `pnpm typecheck`, `pnpm lint`, `pnpm build` on
+  every push and PR. No test suite in CI — the four verification
+  suites need a live Supabase project with real seed data, not worth
+  crediting a template repo's CI for; they stay local scripts, run by
+  hand against a fork before it launches (`FORKING.md`, `DECISIONS.md`
+  — CI and code review).
 - Vercel preview deployments per branch (default behavior)
 
 - Commits are authored by me (SAHEED2010), not Claude. Do NOT add
