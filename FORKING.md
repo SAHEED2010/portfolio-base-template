@@ -44,8 +44,11 @@ git log -1 --format=%H > .forked-from
 
 The **client** creates it at supabase.com, then invites you.
 
-Note the project's **API URL** and **anon key** (Settings → API).
-Ignore the service role key — the site never uses it.
+Note the project's **API URL**, **anon key**, and **service role
+key** (Settings → API). The app itself never uses the service role
+key — but you will, in a moment, for the local verification scripts
+in step 3. Keep it out of `.env.local` and out of Vercel regardless;
+it only ever lives in your terminal for a one-off command.
 
 ## 3. Apply the schema
 
@@ -56,6 +59,21 @@ pnpm exec supabase db push
 
 This applies all migrations in `supabase/migrations/`: the seven
 tables, RLS on every one, and the `media` storage bucket.
+
+### Point your local checkout at the hosted project
+
+The verification below needs the app actually running, and it needs
+to be running against the **client's** project, not a stray local
+Supabase stack. Create `.env.local` in the fork (copy
+`.env.local.example`) with the API URL and anon key from step 2:
+
+```bash
+cp .env.local.example .env.local
+# edit .env.local: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+pnpm dev
+```
+
+Leave this running for the rest of this step.
 
 **Verify RLS actually works before going further** — a
 misconfiguration here exposes the client's inbox:
@@ -83,9 +101,18 @@ Do not continue on anything less than 10/10, 5/5 and 16/16.
 It exists so the base renders as a real portfolio — **it is not the
 client's content.**
 
-Either edit `seed.sql` with the client's real content and push it, or
-push it as-is and have the client replace everything through the
-studio. Editing the file first is usually faster for the initial load.
+Either edit `seed.sql` with the client's real content, or push it
+as-is and have the client replace everything through the studio.
+Editing the file first is usually faster for the initial load.
+
+```bash
+pnpm exec supabase db push --include-seed
+```
+
+`--include-seed` runs `supabase/seed.sql` against the linked project
+— it's the flag that actually gets the content there; `db push` alone
+(step 3) only applies migrations. Re-run this after any later edit to
+`seed.sql`.
 
 Do not ship a client site with "Mara Ellison" anywhere in it.
 
