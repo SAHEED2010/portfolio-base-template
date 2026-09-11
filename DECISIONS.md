@@ -231,6 +231,12 @@ the reasoning.
 - **2026-09-08 — MIME allow-list: jpeg, png, webp only**: `image/svg+xml`
   excluded because SVG is an XSS vector on user upload; `image/gif`
   excluded as large, animated, and rarely wanted on a portfolio.
+- **2026-09-12 — Hero secondary CTA ported to `text-muted`, not
+  `text-neutral-700`**: found on the Afeez Adisa fork (2026-09-11) via
+  a chrome-devtools screenshot pass — the fixed neutral measured
+  1.67:1 against the dark-mode page background, failing WCAG AA's
+  4.5:1. Ported back to the base (`CHANGES.md`) rather than left as a
+  per-fork fix, so every future fork inherits it. Tagged `v1.0.1`.
 
 ## Accounts and ownership
 

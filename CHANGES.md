@@ -12,6 +12,26 @@ to care**.
 
 ---
 
+## 2026-09-12 — Fix: hero secondary CTA unreadable in dark mode
+
+### Fixed
+
+- `src/components/hero.tsx` — the secondary hero CTA ("See what I've
+  built") hardcoded `text-neutral-700`, a fixed light-mode neutral
+  (`FRONTEND_SPEC.md` §1.1's "always-fixed layer"), instead of the
+  theme-reactive `text-muted` token every other dark-mode-aware
+  element uses. Measured contrast against the dark-mode page
+  background: 1.67:1 — WCAG AA requires 4.5:1. Swapped to `text-muted`
+  (5.89:1 dark, ~4.26:1 light).
+
+**Fork needs to care: yes, if forked before this commit and dark mode
+is in use.** Found via a chrome-devtools screenshot pass on the Afeez
+Adisa fork (2026-09-11) and logged there for port-back; applied here
+so new forks inherit the fix instead of re-discovering it. Tagged
+`v1.0.1`.
+
+---
+
 ## 2026-09-09 — Studio: Inbox (loop 4 — the studio is now feature-complete)
 
 ### Added
