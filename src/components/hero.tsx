@@ -182,11 +182,13 @@ export function Hero({ settings }: { settings: SettingsMap }) {
               )}
               {ctaSecondary && (
                 // Softer than the filled CTA on purpose: a hairline
-                // border in a low-contrast neutral, so the primary
-                // action clearly wins the hierarchy.
+                // border in a quiet tone, so the primary action clearly
+                // wins the hierarchy. text-muted (theme-reactive), not a
+                // fixed light-mode neutral — text-neutral-700 here failed
+                // WCAG AA (1.67:1) against the dark-mode page background.
                 <a
                   href="#works"
-                  className="tap inline-flex min-h-11 items-center justify-center rounded-full border border-border px-7 py-3.5 text-sm font-medium text-neutral-700 transition-colors duration-200 hover:border-neutral-400 hover:text-ink"
+                  className="tap inline-flex min-h-11 items-center justify-center rounded-full border border-border px-7 py-3.5 text-sm font-medium text-muted transition-colors duration-200 hover:border-neutral-400 hover:text-ink"
                 >
                   {ctaSecondary}
                 </a>
