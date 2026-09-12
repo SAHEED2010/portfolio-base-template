@@ -80,13 +80,20 @@ function parseTuples(block) {
   return tuples;
 }
 
+// Returns null, not a throw, when a table has no INSERT block — a
+// content table seeded with zero rows (testimonials empty until a
+// fork has real ones, say) is valid seed.sql, not a parse failure.
+// Found generating this fork's manifest: a fork seeding testimonials
+// AND stats both empty crashed here, because the only table this was
+// ever exercised against (the base's own seed.sql) always seeds every
+// table with at least one row.
 function extractBlock(table) {
   const re = new RegExp(
     `insert into public\\.${table}\\s*\\(([^)]*)\\)\\s*values\\s*([\\s\\S]*?);`,
     "i",
   );
   const match = sql.match(re);
-  if (!match) throw new Error(`Could not find INSERT block for ${table}`);
+  if (!match) return null;
   const columns = match[1].split(",").map((c) => c.trim());
   const tuples = parseTuples(match[2]);
   return { columns, tuples };
@@ -94,6 +101,12 @@ function extractBlock(table) {
 
 // --- site_settings: key/value, value is a JSON literal -------------
 const settingsBlock = extractBlock("site_settings");
+if (!settingsBlock) {
+  throw new Error(
+    "Could not find INSERT block for site_settings — every fork's " +
+      "seed.sql must seed this table (SCHEMA.md).",
+  );
+}
 const site_settings = {};
 for (const [key, jsonValue] of settingsBlock.tuples) {
   site_settings[key] = JSON.parse(jsonValue);
@@ -103,7 +116,9 @@ for (const [key, jsonValue] of settingsBlock.tuples) {
 // not every column (display_order gets renumbered by reordering,
 // which is not drift) -----------------------------------------------
 function rowsOf(table, identifyingColumns) {
-  const { columns, tuples } = extractBlock(table);
+  const block = extractBlock(table);
+  if (!block) return [];
+  const { columns, tuples } = block;
   return tuples.map((tuple) => {
     const row = {};
     for (const col of identifyingColumns) {

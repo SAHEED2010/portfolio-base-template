@@ -12,6 +12,28 @@ to care**.
 
 ---
 
+## 2026-09-13 — Fix: seed-manifest generator crashed on a zero-row table
+
+### Fixed
+
+- `scripts/generate-seed-manifest.mjs` — `extractBlock()` threw when a
+  content table had no `insert into` statement in `seed.sql`, instead
+  of treating a missing block as zero rows. The base's own seed.sql
+  never exercised this path (every table seeds at least one row), but
+  a fork whose client has no testimonials yet — or, on the Mahmud
+  Yahaya Umar fork, no testimonials AND no stats yet — crashed
+  regenerating its manifest. `extractBlock` now returns `null` instead
+  of throwing (except for `site_settings`, which every fork must
+  seed); `rowsOf` treats `null` as an empty array.
+
+**Fork needs to care: only if regenerating `seed-manifest.json` from a
+seed.sql that leaves a content table empty.** Independently
+rediscovered on the Mahmud fork; the Afeez fork hit and fixed the same
+bug locally (2026-09-11) without porting it back — ported here now so
+it's fixed once, centrally. Tagged `v1.0.3`.
+
+---
+
 ## 2026-09-13 — Fix: focus-ring glow hardcoded to the original teal accent
 
 ### Fixed

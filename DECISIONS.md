@@ -405,6 +405,13 @@ the reasoning.
   `scripts/check-seed-drift.mjs` compares live content against it and
   flags anything unchanged. Required, not optional, before a fork
   launches — `FORKING.md` §10.
+- **2026-09-13 — `generate-seed-manifest.mjs` treats a table with no
+  INSERT block as zero rows, not a parse error**: the base's own
+  seed.sql always seeds every table, so this path was never
+  exercised until a fork's client had no testimonials (or, on the
+  Mahmud Yahaya Umar fork, no testimonials AND no stats) yet. The
+  Afeez fork hit and fixed this locally (2026-09-11) without porting
+  it back; independently rediscovered here and fixed centrally instead.
 - **2026-09-08 — RLS smoke tests use plain `fetch` against PostgREST,
   not `@supabase/supabase-js`**: no extra dependency, and it exercises
   the same HTTP path the app uses, so RLS is observed directly rather
