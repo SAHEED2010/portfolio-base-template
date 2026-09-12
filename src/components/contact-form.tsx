@@ -17,9 +17,13 @@ const initialState: ContactFormState = { status: "idle" };
 
 // Focus grows a soft accent ring rather than snapping a border on —
 // the field visibly receives focus, which matters most on mobile
-// where the keyboard covers half the screen.
+// where the keyboard covers half the screen. color-mix() against
+// var(--color-accent), not a hardcoded rgba(): the literal used to be
+// the base's original teal (#2E6E68) baked in as numbers, so it went
+// stale the moment a fork changed its accent (found while adding a
+// new accent-colored component to a fork with a different palette).
 const fieldClass =
-  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink shadow-[0_0_0_0_rgba(46,110,104,0)] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-neutral-400 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink shadow-[0_0_0_0_transparent] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] placeholder:text-neutral-400 focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)] focus:outline-none";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();

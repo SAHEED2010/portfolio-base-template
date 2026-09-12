@@ -11,8 +11,10 @@ import { useFormStatus } from "react-dom";
 // hand-rolled input on the "simple" screen is how six screens stop
 // looking like one product.
 
+// color-mix() against var(--color-accent), not a hardcoded rgba() —
+// see contact-form.tsx for why.
 export const fieldClass =
-  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_rgba(46,110,104,0.12)] focus:outline-none";
+  "w-full rounded-xl border border-border bg-surface px-4 py-3 text-base text-ink transition-all duration-200 focus:border-accent focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)] focus:outline-none";
 
 export function Field({
   id,

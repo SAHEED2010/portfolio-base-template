@@ -12,6 +12,28 @@ to care**.
 
 ---
 
+## 2026-09-13 — Fix: focus-ring glow hardcoded to the original teal accent
+
+### Fixed
+
+- `src/components/contact-form.tsx`, `src/components/studio/
+  form-field.tsx`, `src/app/studio/login/login-form.tsx` — the
+  focus-ring glow on every text input (`focus:shadow-[...]`) was
+  `rgba(46,110,104,0.12)`, the original "Slate & Teal" accent
+  (`#2E6E68`) baked in as literal RGB numbers instead of read from
+  `var(--color-accent)`. Invisible on the base itself (accent and the
+  hardcoded number matched), but any fork that changes its accent
+  color keeps the OLD teal glow on every focused input — found while
+  building a new accent-colored component on a fork with a different
+  palette. Swapped to `color-mix(in srgb, var(--color-accent) 12%,
+  transparent)`, which tracks the token.
+
+**Fork needs to care: yes, if forked before this commit and the fork
+uses an accent color other than the base's default teal.** Tagged
+`v1.0.2`.
+
+---
+
 ## 2026-09-12 — Fix: hero secondary CTA unreadable in dark mode
 
 ### Fixed

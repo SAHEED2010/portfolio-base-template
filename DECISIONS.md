@@ -237,6 +237,14 @@ the reasoning.
   1.67:1 against the dark-mode page background, failing WCAG AA's
   4.5:1. Ported back to the base (`CHANGES.md`) rather than left as a
   per-fork fix, so every future fork inherits it. Tagged `v1.0.1`.
+- **2026-09-13 — Input focus-ring glow reads `var(--color-accent)` via
+  `color-mix()`, not a hardcoded `rgba(46,110,104,0.12)`**: that
+  literal was the original teal accent typed as raw numbers in three
+  files (`contact-form.tsx`, `studio/form-field.tsx`,
+  `studio/login-form.tsx`), invisible on the base itself but stale the
+  moment a fork's accent differs — found while building a new
+  accent-colored component on the Mahmud Yahaya Umar fork, which uses
+  a cyan accent. Tagged `v1.0.2`.
 
 ## Accounts and ownership
 
