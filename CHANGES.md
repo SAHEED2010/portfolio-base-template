@@ -12,6 +12,36 @@ to care**.
 
 ---
 
+## 2026-09-13 — Candidate for v1.0.4: focus-ring color-mix() literal duplicated across three files
+
+### Not fixed yet — logged for the next base session
+
+The `v1.0.2` fix (focus-ring glow reading `var(--color-accent)` via
+`color-mix()` instead of a hardcoded teal `rgba()`) landed the same
+literal independently in three places, rather than one shared
+constant or class:
+
+- `src/components/contact-form.tsx:26`
+- `src/app/studio/login/login-form.tsx:12`
+- `src/components/studio/form-field.tsx:17`
+
+All three currently read:
+`focus:shadow-[0_0_0_4px_color-mix(in_srgb,var(--color-accent)_12%,transparent)]`
+
+Found by the Standards axis of an ultra-review on the Mahmud Yahaya
+Umar fork (2026-09-13) as a "Duplicated Code" smell — each of the
+three files got touched to apply the `v1.0.2` token fix, which was
+the chance to extract the shared value and didn't. Fix: pull the
+literal into one exported constant (e.g. `FOCUS_RING_SHADOW` in
+`src/lib/form-helpers.ts`, alongside `emptyToNull`) and reference it
+from all three `fieldClass` strings.
+
+**Fork needs to care: no** — purely a maintainability improvement,
+same rendered output either way. Not urgent, but cheap to fix
+whenever `v1.0.4` is cut.
+
+---
+
 ## 2026-09-13 — Fix: seed-manifest generator crashed on a zero-row table
 
 ### Fixed
